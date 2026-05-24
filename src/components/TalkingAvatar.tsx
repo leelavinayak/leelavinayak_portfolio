@@ -1,17 +1,17 @@
 import { useState, useEffect, useRef, FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { 
-  Volume2, 
-  VolumeX, 
-  Sparkles, 
-  Terminal, 
-  Mic, 
-  MicOff, 
-  Navigation, 
-  Plus, 
-  Compass, 
-  Activity, 
-  Radio, 
+import {
+  Volume2,
+  VolumeX,
+  Sparkles,
+  Terminal,
+  Mic,
+  MicOff,
+  Navigation,
+  Plus,
+  Compass,
+  Activity,
+  Radio,
   Info,
   X,
   MessageSquare,
@@ -43,7 +43,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
   const [textInput, setTextInput] = useState("");
   const [micAuthorized, setMicAuthorized] = useState<boolean | null>(null);
   const [isRecognitionSupported, setIsRecognitionSupported] = useState(true);
-  
+
   // Chat list session logs
   const [messages, setMessages] = useState<Message[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -66,7 +66,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
   useEffect(() => {
     try {
       localStorage.setItem("klv_voice_muted", String(isMuted));
-    } catch {}
+    } catch { }
   }, [isMuted]);
 
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
@@ -93,30 +93,12 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     isMutedRef.current = isMuted;
   }, [isMuted]);
 
-  // Clean reset of browser SpeechSynthesis queue and voice pre-loading on page load/first-mount
+  // Clean reset of browser SpeechSynthesis queue on page load/first-mount
   useEffect(() => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       try {
         window.speechSynthesis.cancel();
-        
-        // Trigger voice loading immediately on mount to ensure they are ready before click
-        const voices = window.speechSynthesis.getVoices();
-        if (voices.length > 0) {
-          voicesLoadedRef.current = true;
-        }
-        
-        const handleVoicesChanged = () => {
-          const v = window.speechSynthesis.getVoices();
-          if (v.length > 0) {
-            voicesLoadedRef.current = true;
-          }
-        };
-        window.speechSynthesis.addEventListener("voiceschanged", handleVoicesChanged);
-        
-        return () => {
-          window.speechSynthesis.removeEventListener("voiceschanged", handleVoicesChanged);
-        };
-      } catch (e) {}
+      } catch (e) { }
     }
   }, []);
 
@@ -150,13 +132,13 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       if (microphoneStreamInstance) {
         try {
           microphoneStreamInstance.getTracks().forEach(track => track.stop());
-        } catch (e) {}
+        } catch (e) { }
         microphoneStreamInstance = null;
       }
       if (audioContextInstance && audioContextInstance.state !== "closed") {
         try {
           audioContextInstance.close();
-        } catch (e) {}
+        } catch (e) { }
         audioContextInstance = null;
       }
       analyserInstance = null;
@@ -405,7 +387,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
   }, [isListening, isSpeaking, isWakeWordActive]);
 
   const cleanName = visitorName.trim() || "Valued Visitor";
-  
+
   // Default introduction voice prompt
   const defaultSpeechText = `Hello, ${cleanName}! I am KLV, your specialized virtual self-assistant. Leela is a passionate Full Stack MERN Developer and an AI and ML engineering student. He specializes in designing clean React frontends, building secure Node and Express backends, and engineering intelligent machine learning models. His educational background allows him to write application layers that are structured to gracefully capture smart predictions and analytical feeds. Say KLV followed by open about page, or show projects to verbally navigate this portfolio, or chat with me here!`;
 
@@ -436,7 +418,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
   // Speech Recognition API Initialization - run ONCE on mount
   useEffect(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    
+
     if (!SpeechRecognition) {
       setIsRecognitionSupported(false);
       console.warn("Speech recognition is not supported in this browser.");
@@ -517,7 +499,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       if (recognitionRef.current) {
         try {
           recognitionRef.current.abort();
-        } catch (e) {}
+        } catch (e) { }
       }
     };
   }, []);
@@ -539,7 +521,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
             // First stop standard listening to avoid overlapping handlers or resources
             try {
               recognitionRef.current.stop();
-            } catch (e) {}
+            } catch (e) { }
 
             setTimeout(() => {
               if (shouldBeListeningRef.current && !isListening) {
@@ -578,7 +560,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       isMutedRef.current = false;
       try {
         localStorage.setItem("klv_voice_muted", "false");
-      } catch (e) {}
+      } catch (e) { }
       const welcomeTimeout = setTimeout(() => {
         setIsOpen(true);
         startListeningLoop();
@@ -592,7 +574,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
           }
           const cleanVisitor = visitorName.trim() || "Explorer";
           const introGreeting = `Hello, ${cleanVisitor}! I am KLV, your specialized virtual self-assistant. Welcome to Leela Vinayak Kothakota's digital portfolio! Leela is a passionate Full Stack MERN Developer and an Artificial Intelligence & Machine Learning student with experience building scalable web applications, secure REST APIs, and interactive user interfaces. His scholastic discipline helps him view software through a predictive lens—structuring web modules not as static templates, but as scalable pipelines designed to fetch smart predictions seamlessly. Say KLV followed by open about page, or show projects to verbally navigate, or type inside the chat panel right here. Let's begin the tour!`;
-          
+
           addKlvMessage(introGreeting);
           startSpeakingText(introGreeting);
         }
@@ -616,11 +598,11 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     (window as any).speakKlvText = (text: string) => {
       try {
         localStorage.setItem("klv_voice_muted", "false");
-      } catch (e) {}
+      } catch (e) { }
       setIsMutedRef.current?.(false);
       isMutedRef.current = false;
       setIsOpenRef.current?.(true);
-      
+
       // Execute speak synchronously to preserve the browser's user activation/gesture safety token
       addKlvMessageRef.current?.(text);
       startSpeakingTextRef.current?.(text);
@@ -663,7 +645,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();
-      } catch (e) {}
+      } catch (e) { }
     }
     setIsListening(false);
   };
@@ -724,9 +706,9 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     if (!textSanitized) return;
 
     // Filter wake word 'KLV'
-    const isWakeWordPresent = 
-      textSanitized.includes("klv") || 
-      textSanitized.includes("k l v") || 
+    const isWakeWordPresent =
+      textSanitized.includes("klv") ||
+      textSanitized.includes("k l v") ||
       textSanitized.includes("kay el vee") ||
       textSanitized.includes("clv") ||
       textSanitized.includes("klb") ||
@@ -736,7 +718,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     if (isWakeWordPresent) {
       // Wake word triggered - activate premium visual ripple and audio confirmation chime!
       setIsWakeWordActive(true);
-      
+
       try {
         const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
         if (AudioCtx) {
@@ -834,7 +816,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     if (targetSectionId) {
       addKlvMessage(speechReport);
       startSpeakingText(speechReport);
-      
+
       setTimeout(() => {
         document.getElementById(targetSectionId)?.scrollIntoView({ behavior: "smooth" });
       }, 250);
@@ -842,7 +824,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       // Dynamic AI chatbot powered by server-side Gemini 3.5-flash
       const messageId = Math.random().toString(36).substring(7);
       const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      
+
       setMessages(prev => [...prev, {
         id: messageId,
         sender: "klv",
@@ -878,9 +860,9 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
         startSpeakingText(cleanSpeakText);
       } catch (error) {
         console.error("Gemini api error:", error);
-        setMessages(prev => prev.map(m => m.id === messageId ? { 
-          ...m, 
-          text: "I am having trouble routing this to my Gemini voice core right now. Please ensure GEMINI_API_KEY is configured in your Settings > Secrets panel." 
+        setMessages(prev => prev.map(m => m.id === messageId ? {
+          ...m,
+          text: "I am having trouble routing this to my Gemini voice core right now. Please ensure GEMINI_API_KEY is configured in your Settings > Secrets panel."
         } : m));
       }
     }
@@ -890,11 +872,11 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
   const handleTextSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!textInput.trim()) return;
-    
+
     const submittedVal = textInput.trim();
     setTextInput("");
     addUserMessage(submittedVal);
-    
+
     // Process matching command layout
     setTimeout(() => {
       handleDirectNavigation(submittedVal.toLowerCase(), true);
@@ -988,7 +970,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
         window.speechSynthesis.resume();
       }
       window.speechSynthesis.cancel();
-    } catch (e) {}
+    } catch (e) { }
 
     // Reset ignoreErrorsRef shortly after cancel executes to handle synchronous events
     setTimeout(() => {
@@ -1015,31 +997,31 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
         if (audioCtx.state === "suspended") {
           audioCtx.resume();
         }
-        
+
         const osc1 = audioCtx.createOscillator();
         const osc2 = audioCtx.createOscillator();
         const biquadFilter = audioCtx.createBiquadFilter();
         const gainNode = audioCtx.createGain();
-        
+
         osc1.connect(biquadFilter);
         osc2.connect(biquadFilter);
         biquadFilter.connect(gainNode);
         gainNode.connect(audioCtx.destination);
-        
+
         biquadFilter.type = "lowpass";
         biquadFilter.frequency.setValueAtTime(800, audioCtx.currentTime);
-        
+
         osc1.type = "sine";
         osc1.frequency.setValueAtTime(320, audioCtx.currentTime);
         osc1.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.15);
-        
+
         osc2.type = "triangle";
         osc2.frequency.setValueAtTime(160, audioCtx.currentTime);
         osc2.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 0.15);
-        
+
         gainNode.gain.setValueAtTime(0.015, audioCtx.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
-        
+
         osc1.start();
         osc2.start();
         osc1.stop(audioCtx.currentTime + 0.25);
@@ -1050,7 +1032,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     }
 
     speakQueueRef.current = sentences;
-    
+
     // Ensure voices are loaded before speaking (critical for Chrome which loads voices asynchronously)
     if (!voicesLoadedRef.current) {
       waitForVoices().then(() => {
@@ -1065,29 +1047,23 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
   };
 
   const getBestMaleVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null => {
-    // Apple device check to bypass forcing custom voices on iOS/macOS Safari where Siri voices fail
-    const isAppleDevice = typeof navigator !== "undefined" && /iPad|iPhone|iPod|Macintosh/i.test(navigator.userAgent);
-    if (isAppleDevice) {
-      return null;
-    }
-
     // 1. Filter out known broken/blacklisted voices
     const activeVoices = voices.filter(v => !brokenVoicesRef.current.has(v.name));
-    
+
     // 2. EXTREMELY CRITICAL: Inside sandboxed iframe environments (like the AI Studio preview container),
     // remote network-based cloud voices (localService === false) are blocked from loading their speech synthesis chunks
     // by core cross-origin and connection sandboxing rules. This immediately fails or permanently freezes/locks the
     // browser's SpeechSynthesis queue, making the assistant go silent and disabling sound button feedbacks.
     // Therefore, we MUST prioritize strictly local system offline voices (localService === true).
-    const localEnglishVoices = activeVoices.filter(v => 
-      v.lang.toLowerCase().startsWith("en") && 
+    const localEnglishVoices = activeVoices.filter(v =>
+      v.lang.toLowerCase().startsWith("en") &&
       v.localService === true
     );
 
     const femaleBlacklist = [
-      "female", "zira", "hazel", "samantha", "victoria", "karen", "susan", "preeti", 
-      "joanna", "microsoft sabina", "clara", "fiona", "moira", "tessa", "veena", 
-      "heera", "mei-jia", "sin-ji", "kanya", "elsa", "kalpana", "haruka", "kyoko", 
+      "female", "zira", "hazel", "samantha", "victoria", "karen", "susan", "preeti",
+      "joanna", "microsoft sabina", "clara", "fiona", "moira", "tessa", "veena",
+      "heera", "mei-jia", "sin-ji", "kanya", "elsa", "kalpana", "haruka", "kyoko",
       "yuna", "ziyu", "chen-chen", "nanami", "da-bin", "ji-min", "sara", "siri", "cortana",
       "kathy", "agnes", "alice", "alva", "amelie", "anna", "carmit", "damayanti", "ellen",
       "emora", "ioana", "katya", "lekha", "luciana", "mariska", "melina", "milena", "monica",
@@ -1095,7 +1071,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     ];
 
     // Filter local English voices to isolate beautiful warm masculine/baritone profiles
-    const localNonFemaleVoices = localEnglishVoices.filter(v => 
+    const localNonFemaleVoices = localEnglishVoices.filter(v =>
       !femaleBlacklist.some(f => v.name.toLowerCase().includes(f))
     );
 
@@ -1125,12 +1101,12 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     }
 
     // 2. Fallback search to any voice name containing masculine signatures in local non-female list
-    const genericLocalMale = localNonFemaleVoices.find(v => 
-      v.name.toLowerCase().includes("male") || 
-      v.name.toLowerCase().includes("david") || 
-      v.name.toLowerCase().includes("guy") || 
-      v.name.toLowerCase().includes("george") || 
-      v.name.toLowerCase().includes("daniel") || 
+    const genericLocalMale = localNonFemaleVoices.find(v =>
+      v.name.toLowerCase().includes("male") ||
+      v.name.toLowerCase().includes("david") ||
+      v.name.toLowerCase().includes("guy") ||
+      v.name.toLowerCase().includes("george") ||
+      v.name.toLowerCase().includes("daniel") ||
       v.name.toLowerCase().includes("alex") ||
       v.name.toLowerCase().includes("sam") ||
       v.name.toLowerCase().includes("mark")
@@ -1142,7 +1118,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
 
     // 4. Fallback search to English male voices (even if localService is false/undefined, as some environments are not sandboxed and network voices work perfectly)
     const englishVoices = activeVoices.filter(v => v.lang.toLowerCase().startsWith("en"));
-    const nonFemaleEnglishVoices = englishVoices.filter(v => 
+    const nonFemaleEnglishVoices = englishVoices.filter(v =>
       !femaleBlacklist.some(f => v.name.toLowerCase().includes(f))
     );
 
@@ -1151,12 +1127,12 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       if (found) return found;
     }
 
-    const genericMaleVoice = nonFemaleEnglishVoices.find(v => 
-      v.name.toLowerCase().includes("male") || 
-      v.name.toLowerCase().includes("david") || 
-      v.name.toLowerCase().includes("guy") || 
-      v.name.toLowerCase().includes("george") || 
-      v.name.toLowerCase().includes("daniel") || 
+    const genericMaleVoice = nonFemaleEnglishVoices.find(v =>
+      v.name.toLowerCase().includes("male") ||
+      v.name.toLowerCase().includes("david") ||
+      v.name.toLowerCase().includes("guy") ||
+      v.name.toLowerCase().includes("george") ||
+      v.name.toLowerCase().includes("daniel") ||
       v.name.toLowerCase().includes("alex")
     );
     if (genericMaleVoice) return genericMaleVoice;
@@ -1202,7 +1178,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume();
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // Create utterance for this single sentence chunk (avoids the 15-second Chrome cutoff)
     const utterance = new SpeechSynthesisUtterance(sentenceToSpeak);
@@ -1211,7 +1187,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     utterance.volume = 1.0;
     utterance.rate = 1.02;  // Standard, natural, polished speaking flow
     utterance.pitch = 1.0; // Standard, highly compatible speech pitch to prevent OS exceptions
-    
+
     utteranceRef.current = utterance;
     // Chrome Garbage-Collection Bugfix: lock utterance references securely in a global array
     (window as any).klvUtteranceQueue = (window as any).klvUtteranceQueue || [];
@@ -1235,7 +1211,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     // 36-word sentences take ~15 seconds. Capping watchdog at 45 seconds prevents premature cutoffs!
     const wordsCount = sentenceToSpeak.split(/\s+/).length;
     const estimatedDurationSecs = Math.max(6, Math.ceil(wordsCount * 0.8) + 6);
-    
+
     let isTerminated = false;
     const safetyBackupTimer = setTimeout(() => {
       if (!isTerminated) {
@@ -1247,7 +1223,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
         if ("speechSynthesis" in window) {
           try {
             window.speechSynthesis.cancel();
-          } catch (e) {}
+          } catch (e) { }
         }
         setTimeout(() => {
           ignoreErrorsRef.current = false;
@@ -1275,7 +1251,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
 
     utterance.onerror = (err) => {
       console.warn("Vocal utterance error with voice:", idealMaleVoice?.name, err);
-      
+
       // If we flagged that we are intentionally cancelling, return immediately and do NOT run any retry or blacklisting!
       if (ignoreErrorsRef.current) {
         console.log("Speech cancellation/error event ignored due to active manual cancel/override.");
@@ -1299,7 +1275,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       if (!isTerminated) {
         isTerminated = true;
         clearTimeout(safetyBackupTimer);
-        
+
         // Immediate system-default speech synthesis fallback retry for this specific sentence
         console.log("Retrying sentence synthesis using default system voice fallback...");
         try {
@@ -1309,7 +1285,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
           fallbackUtterance.rate = 1.0;
           fallbackUtterance.pitch = 1.0; // Highly compatible
           // No custom `.voice` property to guarantee native system default speaking works perfectly!
-          
+
           fallbackUtterance.onend = () => {
             currentQueueIndexRef.current = index + 1;
             setTimeout(speakNextSentence, 150);
@@ -1319,7 +1295,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
             currentQueueIndexRef.current = index + 1;
             setTimeout(speakNextSentence, 100);
           };
-          
+
           setTimeout(() => {
             try {
               if (window.speechSynthesis.paused) {
@@ -1336,7 +1312,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
         } catch (e) {
           console.error("Fallback speech execute failed", e);
         }
-        
+
         currentQueueIndexRef.current = index + 1;
         setTimeout(speakNextSentence, 105);
       }
@@ -1366,7 +1342,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     if ("speechSynthesis" in window) {
       try {
         window.speechSynthesis.cancel();
-      } catch (e) {}
+      } catch (e) { }
     }
     setIsSpeaking(false);
     setTimeout(() => {
@@ -1377,9 +1353,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
   const openAssistantChat = () => {
     const triggerSpeechAfterUnlock = () => {
       // Direct start of continuous voice recognition listening standby
-      setTimeout(() => {
-        startListeningLoop();
-      }, 150);
+      startListeningLoop();
 
       const hasSpoken = typeof window !== "undefined" && ((window as any).klvIntroSpoken || introSpokenRef.current);
       if (messages.length === 0 && !hasSpoken) {
@@ -1398,7 +1372,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     isMutedRef.current = false;
     try {
       localStorage.setItem("klv_voice_muted", "false");
-    } catch (e) {}
+    } catch (e) { }
 
     // Force unblock Chrome & Safari SpeechSynthesis sandbox rules via direct user interaction token.
     // Play the silent dummy utterance to trigger browser speech engine unlock, then execute triggerSpeechAfterUnlock immediately.
@@ -1428,11 +1402,11 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
   };
 
   return (
-    <div 
-      id="klv-floating-chat-container" 
+    <div
+      id="klv-floating-chat-container"
       className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end"
     >
-      
+
       <AnimatePresence>
         {/* Expanded Chat Assistant View */}
         {isOpen && (
@@ -1441,10 +1415,10 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.92 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
-            className="w-full sm:w-[calc(100vw-32px)] sm:max-w-[385px] h-full sm:h-[610px] fixed sm:absolute inset-0 sm:inset-auto sm:bottom-0 sm:right-0 rounded-none sm:rounded-[32px] overflow-hidden shadow-[0_15px_45px_rgba(147,51,234,0.12)] border-0 sm:border border-purple-200/80 flex flex-col backdrop-blur-xl relative bg-white/98 text-slate-850 z-[100] sm:z-auto"
+            className="w-[calc(100vw-32px)] max-w-[385px] h-[75vh] sm:h-[610px] rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-[0_15px_45px_rgba(147,51,234,0.12)] border border-purple-200/80 flex flex-col backdrop-blur-xl relative bg-white/98 text-slate-850"
           >
             {/* Cyberpunk grid overlay background decoration for high structural finish */}
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none rounded-none sm:rounded-[32px] z-0" />
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none rounded-[32px] z-0" />
 
             {/* 1. Header with glowing futuristic status bar - Light Mode Theme only */}
             <div className="p-4 border-b border-purple-100 bg-white flex items-center justify-between text-slate-800 relative z-10 shrink-0">
@@ -1452,12 +1426,10 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
               <div className="flex items-center gap-3 relative z-10">
                 {/* Micro pulsating recording orb */}
                 <div className="relative">
-                  <span className={`absolute -inset-1 rounded-full blur-md opacity-75 ${
-                    isListening ? "bg-emerald-400 animate-pulse" : "bg-purple-400 animate-pulse"
-                  }`} />
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center border border-purple-100 ${
-                    isListening ? "bg-emerald-50 shadow-[0_0_12px_rgba(16,185,129,0.15)]" : "bg-purple-50 shadow-[0_0_12px_rgba(168,85,247,0.15)]"
-                  }`}>
+                  <span className={`absolute -inset-1 rounded-full blur-md opacity-75 ${isListening ? "bg-emerald-400 animate-pulse" : "bg-purple-400 animate-pulse"
+                    }`} />
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center border border-purple-100 ${isListening ? "bg-emerald-50 shadow-[0_0_12px_rgba(16,185,129,0.15)]" : "bg-purple-50 shadow-[0_0_12px_rgba(168,85,247,0.15)]"
+                    }`}>
                     {isListening ? (
                       <Mic className="w-4 h-4 text-emerald-500 animate-bounce" />
                     ) : (
@@ -1465,7 +1437,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                     )}
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="text-[10px] font-mono font-black tracking-widest text-purple-700 uppercase flex items-center gap-1">
                     <span>KLV VOICE CORES</span>
@@ -1491,7 +1463,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                     isMutedRef.current = nextMuteState;
                     try {
                       localStorage.setItem("klv_voice_muted", String(nextMuteState));
-                    } catch (e) {}
+                    } catch (e) { }
 
                     if (!nextMuteState) {
                       // Instantly say "Voice unmuted." to confirm to the user
@@ -1504,27 +1476,26 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                           utterance.lang = "en-US";
                           utterance.rate = 1.0;
                           utterance.pitch = 1.0;
-                          
+
                           const voices = window.speechSynthesis.getVoices();
                           const idealMaleVoice = getBestMaleVoice(voices);
                           if (idealMaleVoice) {
                             utterance.voice = idealMaleVoice;
                           }
-                          
+
                           utterance.onstart = () => setIsSpeaking(true);
                           utterance.onend = () => setIsSpeaking(false);
                           window.speechSynthesis.speak(utterance);
-                        } catch (e) {}
+                        } catch (e) { }
                       }
                     } else {
                       stopSpeaking();
                     }
                   }}
-                  className={`px-3 py-1.5 rounded-xl border transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm ${
-                    isMuted 
-                      ? "bg-pink-50 text-pink-600 border-pink-200 shadow-[0_0_15px_rgba(244,63,94,0.1)] hover:bg-pink-100" 
+                  className={`px-3 py-1.5 rounded-xl border transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm ${isMuted
+                      ? "bg-pink-50 text-pink-600 border-pink-200 shadow-[0_0_15px_rgba(244,63,94,0.1)] hover:bg-pink-100"
                       : "bg-purple-50 text-purple-600 border-purple-100 hover:bg-purple-100/60"
-                  }`}
+                    }`}
                   title={isMuted ? "Unmute Voice Assistant Feed" : "Mute Voice Assistant Feed"}
                 >
                   {isMuted ? (
@@ -1553,7 +1524,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
             </div>
 
             {/* 2. Scrollable chat dialog message history */}
-            <div 
+            <div
               ref={scrollRef}
               className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-purple-150 scrollbar-track-transparent z-10 bg-slate-50/40"
             >
@@ -1573,11 +1544,10 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                     )}
                     <div className="max-w-[82%] flex flex-col gap-1">
                       <div className="relative group/msg">
-                        <div className={`px-4 py-3 rounded-2xl text-[11px] font-sans leading-relaxed tracking-wide ${
-                          msg.sender === "user"
+                        <div className={`px-4 py-3 rounded-2xl text-[11px] font-sans leading-relaxed tracking-wide ${msg.sender === "user"
                             ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-tr-none shadow-md"
                             : "bg-purple-50 text-slate-850 rounded-tl-none border border-purple-100/70 pr-8 shadow-sm"
-                        }`}>
+                          }`}>
                           {msg.sender === "klv" && (
                             <div className="text-[7.5px] font-mono font-extrabold text-purple-600 tracking-widest uppercase mb-1 flex items-center gap-1 select-none">
                               <Sparkles className="w-2.5 h-2.5 text-pink-500" />
@@ -1585,7 +1555,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                             </div>
                           )}
                           {msg.text}
-                          
+
                           {msg.sender === "klv" && (
                             <button
                               type="button"
@@ -1601,9 +1571,8 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                           )}
                         </div>
                       </div>
-                      <span className={`text-[8.5px] font-mono text-slate-500 px-1 ${
-                        msg.sender === "user" ? "text-right" : "text-left"
-                      }`}>
+                      <span className={`text-[8.5px] font-mono text-slate-500 px-1 ${msg.sender === "user" ? "text-right" : "text-left"
+                        }`}>
                         {msg.timestamp}
                       </span>
                     </div>
@@ -1615,11 +1584,10 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
             {/* 3. Center Advanced Male Voice Real-Time Frequency Spectrum Analyzer - Light Mode */}
             <div className={`p-3 border-t border-b border-purple-100 flex flex-col justify-between pointer-events-none select-none relative h-34 overflow-hidden transition-colors duration-500 z-10 ${isWakeWordActive ? "bg-cyan-50/50" : "bg-purple-50/50"}`}>
               <div className={`absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent to-transparent animate-pulse transition-all duration-300 ${isWakeWordActive ? "via-cyan-400" : "via-purple-400/40"}`} />
-              
+
               {/* Radial responsive glowing ambient cast */}
-              <div className={`absolute w-36 h-36 rounded-full blur-3xl opacity-15 left-1/2 -ml-18 -bottom-14 transition-colors duration-500 ${
-                isWakeWordActive ? "bg-cyan-500 animate-pulse" : isSpeaking ? "bg-pink-500 shadow-[0_0_20px_rgba(244,63,94,0.1)]" : isListening ? "bg-emerald-550" : "bg-purple-550"
-              }`} />
+              <div className={`absolute w-36 h-36 rounded-full blur-3xl opacity-15 left-1/2 -ml-18 -bottom-14 transition-colors duration-500 ${isWakeWordActive ? "bg-cyan-500 animate-pulse" : isSpeaking ? "bg-pink-500 shadow-[0_0_20px_rgba(244,63,94,0.1)]" : isListening ? "bg-emerald-550" : "bg-purple-550"
+                }`} />
 
               {/* Analyzer HUD Telemetry Header */}
               <div className="flex justify-between items-center relative z-10 w-full mb-1 text-[8px] font-mono text-purple-600">
@@ -1640,7 +1608,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                 <div className="absolute inset-x-0 top-2 border-t border-purple-100/40" />
                 <div className="absolute inset-x-0 top-6 border-t border-purple-100/40" />
                 <div className="absolute inset-x-0 top-10 border-t border-purple-100/40" />
-                
+
                 {/* Visual DB Scale Markers on side */}
                 <span className="absolute left-1.5 top-1 text-[6.5px] font-mono text-slate-400">0dB</span>
                 <span className="absolute left-1.5 top-5 text-[6.5px] font-mono text-slate-400">-12dB</span>
@@ -1654,15 +1622,14 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                       <motion.div
                         animate={{ bottom: peakHeight }}
                         transition={{ type: "spring", stiffness: 280, damping: 25 }}
-                        className={`absolute w-[4px] h-[2px] rounded-full z-20 ${
-                          isWakeWordActive
+                        className={`absolute w-[4px] h-[2px] rounded-full z-20 ${isWakeWordActive
                             ? "bg-cyan-500 shadow-[0_0_3px_rgba(34,211,238,0.5)]"
                             : isSpeaking
                               ? "bg-pink-500 shadow-[0_0_3px_rgba(244,63,94,0.5)]"
                               : isListening
                                 ? "bg-emerald-500 shadow-[0_0_3px_rgba(16,185,129,0.5)]"
                                 : "bg-purple-300/60"
-                        }`}
+                          }`}
                       />
 
                       {/* Frequency Bar Column */}
@@ -1673,15 +1640,14 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                           stiffness: 350,
                           damping: 20
                         }}
-                        className={`w-[4px] rounded-t-full transition-colors duration-400 relative z-10 ${
-                          isWakeWordActive
+                        className={`w-[4px] rounded-t-full transition-colors duration-400 relative z-10 ${isWakeWordActive
                             ? "bg-gradient-to-t from-cyan-400 via-sky-400 to-cyan-300"
-                            : isSpeaking 
-                              ? "bg-gradient-to-t from-purple-500 via-indigo-400 to-pink-500" 
-                              : isListening 
-                                ? "bg-gradient-to-t from-emerald-500 via-teal-400 to-cyan-400" 
+                            : isSpeaking
+                              ? "bg-gradient-to-t from-purple-500 via-indigo-400 to-pink-500"
+                              : isListening
+                                ? "bg-gradient-to-t from-emerald-500 via-teal-400 to-cyan-400"
                                 : "bg-purple-100"
-                        }`}
+                          }`}
                       />
                     </div>
                   );
@@ -1697,7 +1663,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                 <span>4kHz</span>
                 <span>8kHz</span>
               </div>
-              
+
               <div className="text-[9px] font-mono tracking-wider text-center h-4 flex items-center justify-center relative z-10 w-full mt-1.5">
                 {!isRecognitionSupported ? (
                   <span className="text-pink-650 font-bold bg-pink-50 px-2 py-0.5 rounded border border-pink-200">⚠️ WEB SPEECH RECOGNITION NOT SUPPORTED</span>
@@ -1752,11 +1718,10 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
               <button
                 type="button"
                 onClick={handleMicToggle}
-                className={`p-3 rounded-xl transition-all duration-300 cursor-pointer active:scale-90 flex items-center justify-center ${
-                  isListening 
-                    ? "bg-emerald-600 border border-emerald-500 text-white shadow-md" 
+                className={`p-3 rounded-xl transition-all duration-300 cursor-pointer active:scale-90 flex items-center justify-center ${isListening
+                    ? "bg-emerald-600 border border-emerald-500 text-white shadow-md"
                     : "bg-slate-50 text-slate-500 border border-slate-200 hover:text-slate-850 hover:border-purple-300"
-                }`}
+                  }`}
                 title={isListening ? "Click to deactivate voice capture" : "Activate speech commands"}
               >
                 {isListening ? <Mic className="w-4 h-4 text-emerald-100" /> : <MicOff className="w-4 h-4" />}
@@ -1784,7 +1749,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       {/* Floating collapsed activation trigger badge */}
       {!isOpen && (
         <div className="relative group mt-3">
-          
+
           {/* Subtle notification popover tooltip to notify user when they first land */}
           <AnimatePresence>
             {!isOpen && (
@@ -1799,7 +1764,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                   KLV PORTFOLIO SYSTEM
                 </div>
                 Say <span className="text-pink-400 font-black">"KLV open about page"</span> to verbally command this site!
-                
+
                 {/* Micro caret pointing right */}
                 <div className="absolute right-[-5px] bottom-5 w-2.5 h-2.5 rotate-45 bg-slate-900 border-r border-t border-purple-500/30" />
               </motion.div>
@@ -1808,7 +1773,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
 
           {/* Glowing neon halo rings behind circle button */}
           <span className="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-500 blur-md opacity-35 group-hover:opacity-85 transition duration-500 scale-102" />
-          
+
           {/* Concentric cascading visual confirmation ripples of cyber light when "KLV" is detected */}
           <AnimatePresence>
             {isWakeWordActive && (
@@ -1841,9 +1806,8 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
           <button
             type="button"
             onClick={openAssistantChat}
-            className={`relative w-14 h-14 rounded-full bg-slate-950 border flex items-center justify-center text-white cursor-pointer active:scale-95 hover:scale-110 transition duration-300 shadow-[0_5px_22px_rgba(168,85,247,0.4)] ${
-              isWakeWordActive ? "border-cyan-400 shadow-[0_0_25px_rgba(34,211,238,0.7)]" : "border-purple-500/30"
-            }`}
+            className={`relative w-14 h-14 rounded-full bg-slate-950 border flex items-center justify-center text-white cursor-pointer active:scale-95 hover:scale-110 transition duration-300 shadow-[0_5px_22px_rgba(168,85,247,0.4)] ${isWakeWordActive ? "border-cyan-400 shadow-[0_0_25px_rgba(34,211,238,0.7)]" : "border-purple-500/30"
+              }`}
             title="Open KLV Voice Assistant Chat"
           >
             {/* Active pulsing notification dot badge */}
@@ -1852,7 +1816,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                 {unreadCount}
               </span>
             )}
-            
+
             {/* Pulsing inner microphone node icon inside collapsed button badge */}
             <div className="relative flex items-center justify-center">
               <Mic className={`w-6 h-6 transition duration-300 ${isWakeWordActive ? "text-cyan-400 animate-pulse scale-110" : "text-purple-350 group-hover:text-cyan-400"}`} />
