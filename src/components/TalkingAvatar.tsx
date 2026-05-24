@@ -628,6 +628,15 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
 
   // Microphone toggle state
   const handleMicToggle = () => {
+    // Safari / Mobile browser SpeechSynthesis gesture unlock reinforcement
+    if ("speechSynthesis" in window) {
+      try {
+        const dummyUtter = new SpeechSynthesisUtterance(" ");
+        dummyUtter.volume = 0;
+        window.speechSynthesis.speak(dummyUtter);
+      } catch (e) {}
+    }
+
     if (isListening) {
       stopListeningLoop();
       addKlvMessage("Microphone standby. Speak whenever you are ready.");
@@ -896,6 +905,15 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     setTextInput("");
     addUserMessage(submittedVal);
 
+    // Safari / Mobile browser SpeechSynthesis gesture unlock reinforcement
+    if ("speechSynthesis" in window) {
+      try {
+        const dummyUtter = new SpeechSynthesisUtterance(" ");
+        dummyUtter.volume = 0;
+        window.speechSynthesis.speak(dummyUtter);
+      } catch (e) {}
+    }
+
     // Process matching command layout synchronously to preserve user gesture
     handleDirectNavigation(submittedVal.toLowerCase(), true);
   };
@@ -1096,13 +1114,27 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       "yuna", "ziyu", "chen-chen", "nanami", "da-bin", "ji-min", "sara", "siri", "cortana",
       "kathy", "agnes", "alice", "alva", "amelie", "anna", "carmit", "damayanti", "ellen",
       "emora", "ioana", "katya", "lekha", "luciana", "mariska", "melina", "milena", "monica",
-      "nora", "paulina", "satu", "ting-ting", "yelda", "zosia", "zuzana", "whisper", "toy"
+      "nora", "paulina", "satu", "ting-ting", "yelda", "zosia", "zuzana", "whisper", "toy",
+      // Google TTS/Samsung defaults (which are female but do not contain "female" keyword)
+      "google us english", "google uk english", "google au english", "google in english",
+      "google voice", "samsung english", "en-us-x-tpf", "en-us-x-iol", "en-us-x-rgp", 
+      "en-us-x-sfs", "en-us-x-sof", "en-us-x-sfb"
     ];
 
+    const isFemaleOrNonMaleGoogle = (v: SpeechSynthesisVoice) => {
+      const nameLower = v.name.toLowerCase();
+      if (nameLower.includes("female")) return true;
+      if (nameLower.includes("google") && !nameLower.includes("male") && !nameLower.includes("guy")) {
+        return true;
+      }
+      if (nameLower.includes("samsung") && !nameLower.includes("male") && !nameLower.includes("guy")) {
+        return true;
+      }
+      return femaleBlacklist.some(f => nameLower.includes(f));
+    };
+
     // Filter local English voices to isolate beautiful warm masculine/baritone profiles
-    const localNonFemaleVoices = localEnglishVoices.filter(v =>
-      !femaleBlacklist.some(f => v.name.toLowerCase().includes(f))
-    );
+    const localNonFemaleVoices = localEnglishVoices.filter(v => !isFemaleOrNonMaleGoogle(v));
 
     const preferredWarmMaleList = [
       "microsoft david",
@@ -1120,7 +1152,20 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       "en-gb-x-rjs-local",
       "sam",
       "mark",
-      "male"
+      "male",
+      "google us english male",
+      "google uk english male",
+      "google au english male",
+      "google in english male",
+      "google us english-male",
+      "google uk english-male",
+      "rishi",
+      "oliver",
+      "aaron",
+      "arthur",
+      "gordon",
+      "nicky",
+      "fred"
     ];
 
     // 1. Try to find a custom preferred local male voice
@@ -1138,7 +1183,9 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       v.name.toLowerCase().includes("daniel") ||
       v.name.toLowerCase().includes("alex") ||
       v.name.toLowerCase().includes("sam") ||
-      v.name.toLowerCase().includes("mark")
+      v.name.toLowerCase().includes("mark") ||
+      v.name.toLowerCase().includes("rishi") ||
+      v.name.toLowerCase().includes("oliver")
     );
     if (genericLocalMale) return genericLocalMale;
 
@@ -1147,9 +1194,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
 
     // 4. Fallback search to English male voices (even if localService is false/undefined, as some environments are not sandboxed and network voices work perfectly)
     const englishVoices = activeVoices.filter(v => v.lang.toLowerCase().startsWith("en"));
-    const nonFemaleEnglishVoices = englishVoices.filter(v =>
-      !femaleBlacklist.some(f => v.name.toLowerCase().includes(f))
-    );
+    const nonFemaleEnglishVoices = englishVoices.filter(v => !isFemaleOrNonMaleGoogle(v));
 
     for (const pref of preferredWarmMaleList) {
       const found = nonFemaleEnglishVoices.find(v => v.name.toLowerCase().includes(pref));
@@ -1162,7 +1207,8 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       v.name.toLowerCase().includes("guy") ||
       v.name.toLowerCase().includes("george") ||
       v.name.toLowerCase().includes("daniel") ||
-      v.name.toLowerCase().includes("alex")
+      v.name.toLowerCase().includes("alex") ||
+      v.name.toLowerCase().includes("rishi")
     );
     if (genericMaleVoice) return genericMaleVoice;
 
@@ -1190,11 +1236,15 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       isSpeakingRef.current = false;
       stopChromeKeepAlive();
 
-      // Restart microphone listening automatically
+      // Restart microphone listening automatically with a small delay for mobile audio focus
       if (shouldBeListeningRef.current && recognitionRef.current) {
-        try {
-          recognitionRef.current.start();
-        } catch (e) {}
+        setTimeout(() => {
+          if (shouldBeListeningRef.current && !isSpeakingRef.current) {
+            try {
+              recognitionRef.current.start();
+            } catch (e) {}
+          }
+        }, 300);
       }
       return;
     }
@@ -1359,7 +1409,20 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume();
       }
-      window.speechSynthesis.speak(utterance);
+      // Give the browser mic release event a tiny bit of time (80-100ms) on mobile
+      setTimeout(() => {
+        try {
+          window.speechSynthesis.speak(utterance);
+        } catch (speakErr) {
+          console.error("Window speech speak call crashed inside delayed timeout:", speakErr);
+          if (!isTerminated) {
+            isTerminated = true;
+            clearTimeout(safetyBackupTimer);
+            currentQueueIndexRef.current = index + 1;
+            setTimeout(speakNextSentence, 100);
+          }
+        }
+      }, 100);
     } catch (speakErr) {
       console.error("Window speech speak call crashed:", speakErr);
       if (!isTerminated) {
@@ -1457,7 +1520,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
   return (
     <div
       id="klv-floating-chat-container"
-      className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end"
+      className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[65] flex flex-col items-end transition-opacity duration-500 ${!hasEntered ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
     >
 
       <AnimatePresence>
@@ -1755,6 +1818,14 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                   key={idx}
                   type="button"
                   onClick={() => {
+                    // Safari / Mobile browser SpeechSynthesis gesture unlock reinforcement
+                    if ("speechSynthesis" in window) {
+                      try {
+                        const dummyUtter = new SpeechSynthesisUtterance(" ");
+                        dummyUtter.volume = 0;
+                        window.speechSynthesis.speak(dummyUtter);
+                      } catch (e) {}
+                    }
                     addUserMessage(chip.cmd);
                     handleDirectNavigation(chip.cmd);
                   }}

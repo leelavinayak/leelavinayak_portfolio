@@ -20,8 +20,8 @@ export const PROJECTS: Project[] = [
       "Timed test execution with auto-submission upon expiry",
       "Dynamic data analytics charts for individual & overall student performance statistics"
     ],
-    githubUrl: "https://github.com/LeelaVinayak/aptitude-test-system",
-    liveUrl: "#"
+    githubUrl: "#",
+    liveUrl: "https://vemu-quiz-craft.onrender.com"
   },
   {
     id: "library-management",
@@ -35,8 +35,8 @@ export const PROJECTS: Project[] = [
       "Interactive analytics panel showing active inventory, overdues, and user logs",
       "Faceted search and filter suite for library-wide catalog querying"
     ],
-    githubUrl: "https://github.com/LeelaVinayak/library-management",
-    liveUrl: "#"
+    githubUrl: "#",
+    liveUrl: "https://vemu-library-management-system-ni7c.onrender.com"
   },
   {
     id: "logic-gates-simulator",
@@ -50,8 +50,8 @@ export const PROJECTS: Project[] = [
       "Truth table auto-evaluation & simulation validation states",
       "Zero-dependency, pure Vanilla JS engine built for extreme performance"
     ],
-    githubUrl: "https://github.com/LeelaVinayak/logic-gates-simulator",
-    liveUrl: "#"
+    githubUrl: "#",
+    liveUrl: "https://leelavinayak.github.io/Digital-Logic-Gates/"
   },
   {
     id: "the-vibe-co",
@@ -65,8 +65,8 @@ export const PROJECTS: Project[] = [
       "Streamlined user workflow for requesting quotes and managing event plans",
       "Responsive marketplace interface built for seamless mobile and desktop use"
     ],
-    githubUrl: "https://github.com/LeelaVinayak/the-vibe-co",
-    liveUrl: "#"
+    githubUrl: "#",
+    liveUrl: "https://the-vibe-co.onrender.com"
   }
 ];
 
@@ -119,23 +119,23 @@ export const EXPERIENCE: Experience[] = [
 export const EDUCATION: Education[] = [
   {
     degree: "B.Tech in Artificial Intelligence & Machine Learning",
-    institution: "Major in Computer Science & Engineering (AI/ML Spec)",
+    institution: "Vemu Institute Of Technology",
     duration: "2024 – Present",
-    grade: "CGPA: 8.9 / 10",
+    grade: "CGPA: 7.7 / 10",
     description: "Deep immersion into deep learning algorithms, statistical data models, natural language processing, neural network topologies, and high-performance full-stack web computing systems."
   },
   {
     degree: "Intermediate Board (MPC)",
-    institution: "Mathematics, Physics, and Chemistry Academy",
+    institution: "Sri Chaitanya Junior College",
     duration: "2022 – 2024",
-    grade: "Percentage: 96.5%",
+    grade: "Percentage: 82%",
     description: "Rigorous focus on advanced calculus, coordinate geometry, classical thermodynamics, electromagnetism, and systemic inorganic synthesis."
   },
   {
     degree: "Secondary School Certificate (SSC)",
-    institution: "Public High School",
+    institution: "Gitam High School Tirupati",
     duration: "2022 Graduate",
-    grade: "GPA: 10.0 / 10.0",
+    grade: "7.2/10",
     description: "Exceptional mastery of core physical sciences, algebra, language models, and foundational algorithm structures."
   }
 ];

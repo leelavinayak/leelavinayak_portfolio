@@ -39,16 +39,7 @@ interface Review {
   createdBy?: string;
 }
 
-const INITIAL_REVIEWS: Review[] = [
-  {
-    id: "default-1",
-    name: "Srinivas Rao",
-    rating: 5,
-    comment: "Incredible full-stack knowledge! Leela designed a highly robust, optimized database adapter during his internship. A highly recommended developer.",
-    timestamp: "May 20, 2026, 2:15 PM",
-    createdBy: "system"
-  }
-];
+const INITIAL_REVIEWS: Review[] = [];
 
 export default function App() {
   const [isLightMode, setIsLightMode] = useState(true);
@@ -1186,9 +1177,7 @@ EXPERIENCE - INTERNSHIP TIMELINE
             {/* Right Column: Displays Top 10 reviews and ratings */}
             <div className="lg:col-span-7 space-y-6">
               {(() => {
-                const filteredReviews = reviews.length > 1
-                  ? reviews.filter(rev => rev.id !== "default-1")
-                  : reviews;
+                const filteredReviews = reviews.filter(rev => rev.id !== "default-1");
 
                 return (
                   <>
@@ -1637,7 +1626,7 @@ EXPERIENCE - INTERNSHIP TIMELINE
       */}
       <AnimatePresence>
         {simulatedEmail && (
-          <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full p-1 bg-gradient-to-tr from-purple-600 via-pink-500 to-cyan-500 rounded-2xl shadow-2xl overflow-hidden shadow-purple-500/20">
+          <div className="fixed bottom-6 left-6 z-50 max-w-sm w-full p-1 bg-gradient-to-tr from-purple-600 via-pink-500 to-cyan-500 rounded-2xl shadow-2xl overflow-hidden shadow-purple-500/20">
             <motion.div
               initial={{ opacity: 0, y: 40, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}

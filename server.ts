@@ -13,16 +13,7 @@ dotenv.config();
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/leela_portfolio";
 
 // Local in-memory fallbacks in case MongoDB is not running or fails to connect
-const localReviews: any[] = [
-  {
-    id: "default-1",
-    name: "Srinivas Rao",
-    rating: 5,
-    comment: "Incredible full-stack knowledge! Leela designed a highly robust, optimized database adapter during his internship. A highly recommended developer.",
-    timestamp: "May 20, 2026, 2:15 PM",
-    createdBy: "system"
-  }
-];
+const localReviews: any[] = [];
 const localContacts: any[] = [];
 
 mongoose.connect(MONGODB_URI, {
@@ -259,7 +250,7 @@ Keep your replies relative to the user's intent. If they ask a general topic not
       });
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-1.5-flash",
         contents: chatContents,
         config: {
           systemInstruction,
@@ -279,40 +270,13 @@ Keep your replies relative to the user's intent. If they ask a general topic not
     try {
       if (mongoose.connection.readyState !== 1) {
         console.warn("[DATABASE] MongoDB is offline. Returning local reviews database fallback.");
-        let filteredLocal = localReviews;
-        if (localReviews.length > 1) {
-          filteredLocal = localReviews.filter(rev => rev.id !== "default-1");
-        }
-        return res.json(filteredLocal);
+        return res.json(localReviews.filter(rev => rev.id !== "default-1"));
       }
-      let dbReviews: any[] = await Review.find().lean();
-      if (dbReviews.length === 0) {
-        // Seeding database with initial default review
-        const initialSeed = {
-          id: "default-1",
-          name: "Srinivas Rao",
-          rating: 5,
-          comment: "Incredible full-stack knowledge! Leela designed a highly robust, optimized database adapter during his internship. A highly recommended developer.",
-          timestamp: "May 20, 2026, 2:15 PM",
-          createdBy: "system"
-        };
-        await Review.create(initialSeed);
-        dbReviews = [initialSeed];
-      }
-      
-      // If there are visitor-added reviews, remove the initial demo review
-      if (dbReviews.length > 1) {
-        dbReviews = dbReviews.filter(rev => rev.id !== "default-1");
-      }
-      
+      let dbReviews: any[] = await Review.find({ id: { $ne: "default-1" } }).lean();
       return res.json(dbReviews);
     } catch (error: any) {
       console.error("[DATABASE] Error fetching reviews, falling back to local list:", error);
-      let filteredLocal = localReviews;
-      if (localReviews.length > 1) {
-        filteredLocal = localReviews.filter(rev => rev.id !== "default-1");
-      }
-      return res.json(filteredLocal);
+      return res.json(localReviews.filter(rev => rev.id !== "default-1"));
     }
   });
 
