@@ -603,6 +603,20 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       isMutedRef.current = false;
       setIsOpenRef.current?.(true);
 
+      // Warm up/prompt microphone permission synchronously in the gate click user gesture context!
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+          .then(stream => {
+            stream.getTracks().forEach(track => track.stop());
+            shouldBeListeningRef.current = true;
+          })
+          .catch(err => {
+            console.warn("Microphone pre-check permission denied:", err);
+          });
+      } else {
+        shouldBeListeningRef.current = true;
+      }
+
       // Execute speak synchronously to preserve the browser's user activation/gesture safety token
       addKlvMessageRef.current?.(text);
       startSpeakingTextRef.current?.(text);
@@ -759,14 +773,19 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       addUserMessage(rawText);
       handleDirectNavigation(instructionPart || textSanitized, true);
     } else {
-      // No wake-word present. Match against direct registered keywords 
-      // to bypass non-actionable background elements
-      const matched = checkKeywordMatch(textSanitized);
-      if (matched) {
+      // If the chat is open, process ALL speech input as direct interactive user queries
+      if (isOpenRef.current) {
         addUserMessage(rawText);
-        handleDirectNavigation(textSanitized, false);
+        handleDirectNavigation(textSanitized, true);
       } else {
-        console.log("Filtered background audio level trigger:", rawText);
+        // Collapsed mode: only process wake words or strict navigation keywords
+        const matched = checkKeywordMatch(textSanitized);
+        if (matched) {
+          addUserMessage(rawText);
+          handleDirectNavigation(textSanitized, false);
+        } else {
+          console.log("Filtered background audio level trigger in collapsed mode:", rawText);
+        }
       }
     }
   };
@@ -794,7 +813,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     } else if (cleanInput.includes("project") || cleanInput.includes("work") || cleanInput.includes("portfolio")) {
       targetSectionId = "projects";
       sectionDisplayName = "Engineering Projects";
-      speechReport = `Here is Leela's interactive Projects Showcase. He has designed several sophisticated production-grade prototypes. You can interact with his Weekly Aptitude Test System, Library Management System, or Digital Logic Gates Simulator. Simply click the filter buttons to explore!`;
+      speechReport = `Here is Leela's interactive Projects Showcase. He has designed several sophisticated production-grade prototypes. You can interact with his Weekly Aptitude Test System, Library Management System, Digital Logic Gates and The Vibe Co. Simulator. Simply click the filter buttons to explore!`;
     } else if (cleanInput.includes("education") || cleanInput.includes("college") || cleanInput.includes("university") || cleanInput.includes("degree") || cleanInput.includes("grade") || cleanInput.includes("academic") || cleanInput.includes("study") || cleanInput.includes("school")) {
       targetSectionId = "education";
       sectionDisplayName = "Education Node";
@@ -877,10 +896,8 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     setTextInput("");
     addUserMessage(submittedVal);
 
-    // Process matching command layout
-    setTimeout(() => {
-      handleDirectNavigation(submittedVal.toLowerCase(), true);
-    }, 450);
+    // Process matching command layout synchronously to preserve user gesture
+    handleDirectNavigation(submittedVal.toLowerCase(), true);
   };
 
   // Pre-fetch speech voices to warm up SpeechSynthesis cache
@@ -962,6 +979,18 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     if (!("speechSynthesis" in window)) {
       console.warn("Speech synthesis is not supported on this device/browser.");
       return;
+    }
+
+    // Set speaking state to true immediately to coordinate with SpeechRecognition and stop any overlapping restarts
+    setIsSpeaking(true);
+    isSpeakingRef.current = true;
+    setIsListening(false);
+
+    // Stop/suspend the microphone immediately before starting SpeechSynthesis to release audio focus on mobile
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {}
     }
 
     ignoreErrorsRef.current = true;
@@ -1158,7 +1187,15 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     if (index >= queue.length) {
       // Completed speaking the whole queue!
       setIsSpeaking(false);
+      isSpeakingRef.current = false;
       stopChromeKeepAlive();
+
+      // Restart microphone listening automatically
+      if (shouldBeListeningRef.current && recognitionRef.current) {
+        try {
+          recognitionRef.current.start();
+        } catch (e) {}
+      }
       return;
     }
 
@@ -1345,24 +1382,20 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       } catch (e) { }
     }
     setIsSpeaking(false);
+    isSpeakingRef.current = false;
     setTimeout(() => {
       ignoreErrorsRef.current = false;
     }, 120);
+
+    // Restart continuous voice recognition listening if it was active
+    if (shouldBeListeningRef.current && recognitionRef.current) {
+      try {
+        recognitionRef.current.start();
+      } catch (e) {}
+    }
   };
 
   const openAssistantChat = () => {
-    const triggerSpeechAfterUnlock = () => {
-      // Direct start of continuous voice recognition listening standby
-      startListeningLoop();
-
-      const hasSpoken = typeof window !== "undefined" && ((window as any).klvIntroSpoken || introSpokenRef.current);
-      if (messages.length === 0 && !hasSpoken) {
-        triggerStartupWelcomeVoice();
-      } else {
-        startSpeakingText("KLV voice agent at your command. How should I assist you today?");
-      }
-    };
-
     setIsOpen(true);
     setUnreadCount(0);
     setShowNotificationBadge(false);
@@ -1374,8 +1407,22 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
       localStorage.setItem("klv_voice_muted", "false");
     } catch (e) { }
 
+    // Warm up/prompt microphone permission synchronously in the user gesture click context!
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          stream.getTracks().forEach(track => track.stop());
+          shouldBeListeningRef.current = true;
+        })
+        .catch(err => {
+          console.warn("Microphone pre-check permission denied:", err);
+        });
+    } else {
+      shouldBeListeningRef.current = true;
+    }
+
     // Force unblock Chrome & Safari SpeechSynthesis sandbox rules via direct user interaction token.
-    // Play the silent dummy utterance to trigger browser speech engine unlock, then execute triggerSpeechAfterUnlock immediately.
+    // Play the silent dummy utterance to trigger browser speech engine unlock.
     if ("speechSynthesis" in window) {
       try {
         window.speechSynthesis.cancel();
@@ -1386,7 +1433,13 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
         console.warn("Silent unlock bypass error:", e);
       }
     }
-    triggerSpeechAfterUnlock();
+
+    const hasSpoken = typeof window !== "undefined" && ((window as any).klvIntroSpoken || introSpokenRef.current);
+    if (messages.length === 0 && !hasSpoken) {
+      triggerStartupWelcomeVoice();
+    } else {
+      startSpeakingText("KLV voice agent at your command. How should I assist you today?");
+    }
   };
 
   useEffect(() => {
@@ -1493,8 +1546,8 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                     }
                   }}
                   className={`px-3 py-1.5 rounded-xl border transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm ${isMuted
-                      ? "bg-pink-50 text-pink-600 border-pink-200 shadow-[0_0_15px_rgba(244,63,94,0.1)] hover:bg-pink-100"
-                      : "bg-purple-50 text-purple-600 border-purple-100 hover:bg-purple-100/60"
+                    ? "bg-pink-50 text-pink-600 border-pink-200 shadow-[0_0_15px_rgba(244,63,94,0.1)] hover:bg-pink-100"
+                    : "bg-purple-50 text-purple-600 border-purple-100 hover:bg-purple-100/60"
                     }`}
                   title={isMuted ? "Unmute Voice Assistant Feed" : "Mute Voice Assistant Feed"}
                 >
@@ -1545,8 +1598,8 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                     <div className="max-w-[82%] flex flex-col gap-1">
                       <div className="relative group/msg">
                         <div className={`px-4 py-3 rounded-2xl text-[11px] font-sans leading-relaxed tracking-wide ${msg.sender === "user"
-                            ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-tr-none shadow-md"
-                            : "bg-purple-50 text-slate-850 rounded-tl-none border border-purple-100/70 pr-8 shadow-sm"
+                          ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-tr-none shadow-md"
+                          : "bg-purple-50 text-slate-850 rounded-tl-none border border-purple-100/70 pr-8 shadow-sm"
                           }`}>
                           {msg.sender === "klv" && (
                             <div className="text-[7.5px] font-mono font-extrabold text-purple-600 tracking-widest uppercase mb-1 flex items-center gap-1 select-none">
@@ -1623,12 +1676,12 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                         animate={{ bottom: peakHeight }}
                         transition={{ type: "spring", stiffness: 280, damping: 25 }}
                         className={`absolute w-[4px] h-[2px] rounded-full z-20 ${isWakeWordActive
-                            ? "bg-cyan-500 shadow-[0_0_3px_rgba(34,211,238,0.5)]"
-                            : isSpeaking
-                              ? "bg-pink-500 shadow-[0_0_3px_rgba(244,63,94,0.5)]"
-                              : isListening
-                                ? "bg-emerald-500 shadow-[0_0_3px_rgba(16,185,129,0.5)]"
-                                : "bg-purple-300/60"
+                          ? "bg-cyan-500 shadow-[0_0_3px_rgba(34,211,238,0.5)]"
+                          : isSpeaking
+                            ? "bg-pink-500 shadow-[0_0_3px_rgba(244,63,94,0.5)]"
+                            : isListening
+                              ? "bg-emerald-500 shadow-[0_0_3px_rgba(16,185,129,0.5)]"
+                              : "bg-purple-300/60"
                           }`}
                       />
 
@@ -1641,12 +1694,12 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                           damping: 20
                         }}
                         className={`w-[4px] rounded-t-full transition-colors duration-400 relative z-10 ${isWakeWordActive
-                            ? "bg-gradient-to-t from-cyan-400 via-sky-400 to-cyan-300"
-                            : isSpeaking
-                              ? "bg-gradient-to-t from-purple-500 via-indigo-400 to-pink-500"
-                              : isListening
-                                ? "bg-gradient-to-t from-emerald-500 via-teal-400 to-cyan-400"
-                                : "bg-purple-100"
+                          ? "bg-gradient-to-t from-cyan-400 via-sky-400 to-cyan-300"
+                          : isSpeaking
+                            ? "bg-gradient-to-t from-purple-500 via-indigo-400 to-pink-500"
+                            : isListening
+                              ? "bg-gradient-to-t from-emerald-500 via-teal-400 to-cyan-400"
+                              : "bg-purple-100"
                           }`}
                       />
                     </div>
@@ -1703,7 +1756,7 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                   type="button"
                   onClick={() => {
                     addUserMessage(chip.cmd);
-                    setTimeout(() => handleDirectNavigation(chip.cmd), 350);
+                    handleDirectNavigation(chip.cmd);
                   }}
                   className="px-3 py-1.5 rounded-xl border border-purple-100 bg-purple-50/50 text-[9px] font-mono text-purple-700 shrink-0 hover:border-purple-300 hover:bg-purple-50 transition-all duration-300 cursor-pointer flex items-center gap-1.5 hover:scale-102"
                 >
@@ -1719,8 +1772,8 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
                 type="button"
                 onClick={handleMicToggle}
                 className={`p-3 rounded-xl transition-all duration-300 cursor-pointer active:scale-90 flex items-center justify-center ${isListening
-                    ? "bg-emerald-600 border border-emerald-500 text-white shadow-md"
-                    : "bg-slate-50 text-slate-500 border border-slate-200 hover:text-slate-850 hover:border-purple-300"
+                  ? "bg-emerald-600 border border-emerald-500 text-white shadow-md"
+                  : "bg-slate-50 text-slate-500 border border-slate-200 hover:text-slate-850 hover:border-purple-300"
                   }`}
                 title={isListening ? "Click to deactivate voice capture" : "Activate speech commands"}
               >

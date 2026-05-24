@@ -147,7 +147,7 @@ export default function App() {
     };
 
     window.addEventListener("scroll", handleScroll);
-    
+
     // Load local messages at startup
     try {
       const saved = localStorage.getItem("leela_portfolio_messages");
@@ -227,7 +227,7 @@ export default function App() {
         message: clientMessage,
         timestamp: currentTimestamp
       };
-      
+
       const updated = [newMessage, ...savedMessages];
       setSavedMessages(updated);
       try {
@@ -238,7 +238,7 @@ export default function App() {
 
       setIsSubmitting(false);
       setSubmitSuccess(true);
-      
+
       // Reset form variables
       setFormName("");
       setFormEmail("");
@@ -273,7 +273,7 @@ export default function App() {
         message: clientMessage,
         timestamp: currentTimestamp
       };
-      
+
       const updated = [newMessage, ...savedMessages];
       setSavedMessages(updated);
       try {
@@ -284,7 +284,7 @@ export default function App() {
 
       setIsSubmitting(false);
       setSubmitSuccess(true);
-      
+
       setFormName("");
       setFormEmail("");
       setFormMessage("");
@@ -351,7 +351,7 @@ export default function App() {
         setReviews(updated);
         localStorage.setItem("leela_portfolio_reviews", JSON.stringify(updated));
       }
-      
+
       const newMyIds = [reviewId, ...myReviewIds];
       setMyReviewIds(newMyIds);
       localStorage.setItem("leela_portfolio_my_review_ids", JSON.stringify(newMyIds));
@@ -382,10 +382,10 @@ export default function App() {
   const handleDeleteReview = async (idToDelete: string) => {
     const updatedReviews = reviews.filter(r => r.id !== idToDelete);
     setReviews(updatedReviews);
-    
+
     const updatedMyIds = myReviewIds.filter(id => id !== idToDelete);
     setMyReviewIds(updatedMyIds);
-    
+
     try {
       await fetch(`/api/reviews/${idToDelete}`, {
         method: "DELETE"
@@ -411,15 +411,14 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 relative select-none ${
-      isLightMode 
-        ? "bg-slate-50 text-slate-950 grid-bg-light" 
+    <div className={`min-h-screen transition-colors duration-500 relative select-none ${isLightMode
+        ? "bg-slate-50 text-slate-950 grid-bg-light"
         : "bg-slate-950 text-white grid-bg-dark"
-    }`}>
+      }`}>
       {/* Absolute Portal/Identity Lock Overlay */}
       <AnimatePresence>
         {!hasEntered && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
@@ -474,14 +473,14 @@ export default function App() {
                         setVisitorName(finalName);
                         setHasEntered(true);
                         setAutoStartSpeech(true);
-                        
+
                         // Force unblock Chrome & Safari SpeechSynthesis sandbox rules via synchronous user interaction token
                         if ("speechSynthesis" in window) {
                           try {
                             window.speechSynthesis.cancel();
                             const dummyUtter = new SpeechSynthesisUtterance("");
                             window.speechSynthesis.speak(dummyUtter);
-                          } catch (e) {}
+                          } catch (e) { }
                         }
 
                         if (typeof (window as any).speakKlvText === "function") {
@@ -499,7 +498,7 @@ export default function App() {
                       onClick={() => {
                         try {
                           localStorage.removeItem("leela_portfolio_visitor_name");
-                        } catch (e) {}
+                        } catch (e) { }
                         setSavedVisitorName(null);
                         setInputName("");
                       }}
@@ -520,8 +519,8 @@ export default function App() {
                       Please enter your name to authenticate and decrypt the digital portfolio feed.
                     </p>
                   </div>
-                  
-                  <form 
+
+                  <form
                     onSubmit={(e) => {
                       e.preventDefault();
                       const finalName = inputName.trim() || "Guest Explorer";
@@ -530,15 +529,15 @@ export default function App() {
                       setAutoStartSpeech(true);
                       try {
                         localStorage.setItem("leela_portfolio_visitor_name", finalName);
-                      } catch (err) {}
-                      
+                      } catch (err) { }
+
                       // Force unblock Chrome & Safari SpeechSynthesis sandbox rules via synchronous user interaction token
                       if ("speechSynthesis" in window) {
                         try {
                           window.speechSynthesis.cancel();
                           const dummyUtter = new SpeechSynthesisUtterance("");
                           window.speechSynthesis.speak(dummyUtter);
-                        } catch (e) {}
+                        } catch (e) { }
                       }
 
                       // Direct synchronous voice trigger on real click/submit event to bypass browser security locks!
@@ -546,7 +545,7 @@ export default function App() {
                         const greeting = `Hello, ${finalName}! I am KLV, your specialized virtual self-assistant. Welcome to Leela Vinayak Kothakota's digital portfolio! Leela is a passionate Full Stack MERN Developer and an Artificial Intelligence & Machine Learning student with extensive experience building scalable web applications, secure REST APIs, and interactive user interfaces. His academic discipline allows him to view software engineering through a predictive lens, structured as scalable predictive pipelines rather than just static state containers. I have conversational voice capability to talk, listen, and guide you through Leela's work. If you have any questions, simply click the floating microphone below to speak with me or type in our chat frame. Let's begin the tour!`;
                         (window as any).speakKlvText(greeting);
                       }
-                    }} 
+                    }}
                     className="w-full space-y-4"
                   >
                     <div className="relative">
@@ -582,7 +581,7 @@ export default function App() {
                       setAutoStartSpeech(true);
                       try {
                         localStorage.setItem("leela_portfolio_visitor_name", finalName);
-                      } catch (err) {}
+                      } catch (err) { }
 
                       // Force unblock Chrome & Safari SpeechSynthesis sandbox rules via synchronous user interaction token
                       if ("speechSynthesis" in window) {
@@ -590,7 +589,7 @@ export default function App() {
                           window.speechSynthesis.cancel();
                           const dummyUtter = new SpeechSynthesisUtterance("");
                           window.speechSynthesis.speak(dummyUtter);
-                        } catch (e) {}
+                        } catch (e) { }
                       }
 
                       // Direct synchronous voice trigger on real click/submit event to bypass browser security locks!
@@ -619,10 +618,10 @@ export default function App() {
       <ParticleBackground isLightMode={isLightMode} />
 
       {/* Navbar Container */}
-      <Navbar 
-        isLightMode={isLightMode} 
-        onThemeToggle={handleThemeToggle} 
-        activeSection={activeSection} 
+      <Navbar
+        isLightMode={isLightMode}
+        onThemeToggle={handleThemeToggle}
+        activeSection={activeSection}
       />
 
       {/* 
@@ -630,12 +629,12 @@ export default function App() {
         HERO SECTION
         ========================================================================
       */}
-      <section 
-        id="hero" 
+      <section
+        id="hero"
         className="relative min-h-screen flex items-center justify-center pt-28 pb-12 px-6 md:px-12 z-10"
       >
         <div className="max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center justify-center">
-          
+
           {/* Left Column: Premium Interactive AI & Web Developer Artwork */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -645,7 +644,7 @@ export default function App() {
           >
             {/* Outer radial neon backdrop glow */}
             <div className="absolute -inset-4 rounded-[40px] bg-gradient-to-tr from-purple-500/10 via-pink-500/15 to-cyan-400/10 blur-xl opacity-75 group-hover:opacity-100 transition duration-1000" />
-            
+
             <div className="relative max-w-[440px] w-full rounded-[32px] border border-purple-500/25 bg-slate-950/80 p-3 shadow-2xl overflow-hidden backdrop-blur-md">
               <div className="relative rounded-[24px] overflow-hidden aspect-square sm:aspect-[4/3] w-full">
                 <img
@@ -665,11 +664,10 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className={`px-4 py-1.5 rounded-full text-xs font-mono tracking-wide flex items-center gap-2 mb-6 border ${
-                isLightMode 
-                  ? "bg-purple-100/65 border-purple-200 text-purple-700" 
+              className={`px-4 py-1.5 rounded-full text-xs font-mono tracking-wide flex items-center gap-2 mb-6 border ${isLightMode
+                  ? "bg-purple-100/65 border-purple-200 text-purple-700"
                   : "bg-purple-950/20 border-purple-500/20 text-purple-300"
-              }`}
+                }`}
             >
               <Sparkles className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: "3s" }} />
               Seeking Summer 2026 AI & Full-Stack Opportunities
@@ -680,9 +678,8 @@ export default function App() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className={`font-display text-4xl md:text-5xl font-extrabold tracking-tight ${
-                isLightMode ? "text-slate-900" : "text-white"
-              }`}
+              className={`font-display text-4xl md:text-5xl font-extrabold tracking-tight ${isLightMode ? "text-slate-900" : "text-white"
+                }`}
             >
               Hello, <span className="bg-gradient-to-r from-purple-500 via-pink-400 to-cyan-400 bg-clip-text text-transparent">{visitorName}!</span>
             </motion.h1>
@@ -691,9 +688,8 @@ export default function App() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className={`font-display text-3xl md:text-5xl font-extrabold tracking-tight mt-2 ${
-                isLightMode ? "text-slate-800" : "text-slate-100"
-              }`}
+              className={`font-display text-3xl md:text-5xl font-extrabold tracking-tight mt-2 ${isLightMode ? "text-slate-800" : "text-slate-100"
+                }`}
             >
               I am Leela Vinayak Kothakota
             </motion.h2>
@@ -724,9 +720,8 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className={`text-sm md:text-base leading-relaxed mb-8 max-w-xl ${
-                isLightMode ? "text-slate-650" : "text-slate-400"
-              }`}
+              className={`text-sm md:text-base leading-relaxed mb-8 max-w-xl ${isLightMode ? "text-slate-650" : "text-slate-400"
+                }`}
             >
               I am a Full Stack MERN Developer and AI & ML student. I engineer robust web solutions in the MERN ecosystem while training neural weights to interpret and forecast complex data models. Passionate code developer with a keen visual layout discipline.
             </motion.p>
@@ -741,11 +736,10 @@ export default function App() {
               <a
                 id="btn-projects"
                 href="#projects"
-                className={`w-full sm:w-auto px-8 py-3.5 rounded-full font-display text-sm font-bold tracking-wide transition-all shadow-lg flex items-center justify-center gap-2 ${
-                  isLightMode 
-                    ? "bg-purple-600 hover:bg-purple-700 text-white shadow-purple-200" 
+                className={`w-full sm:w-auto px-8 py-3.5 rounded-full font-display text-sm font-bold tracking-wide transition-all shadow-lg flex items-center justify-center gap-2 ${isLightMode
+                    ? "bg-purple-600 hover:bg-purple-700 text-white shadow-purple-200"
                     : "bg-white hover:bg-zinc-100 text-slate-950 shadow-slate-950/50"
-                }`}
+                  }`}
               >
                 View Projects <ArrowRight className="w-4 h-4" />
               </a>
@@ -754,11 +748,10 @@ export default function App() {
                 id="btn-resume"
                 href="/leelavinayak_resume.pdf"
                 download="leelavinayak_resume.pdf"
-                className={`w-full sm:w-auto px-8 py-3.5 rounded-full font-display text-sm font-bold tracking-wide transition-all flex items-center justify-center gap-2 border ${
-                  isLightMode
+                className={`w-full sm:w-auto px-8 py-3.5 rounded-full font-display text-sm font-bold tracking-wide transition-all flex items-center justify-center gap-2 border ${isLightMode
                     ? "bg-stone-50 border-stone-200 text-slate-700 hover:bg-stone-100"
                     : "bg-slate-950/40 border-purple-500/25 text-purple-300 hover:border-purple-400/50 hover:bg-slate-900/35"
-                }`}
+                  }`}
               >
                 <Download className="w-4 h-4" /> Download Resume
               </a>
@@ -766,11 +759,10 @@ export default function App() {
               <a
                 id="btn-contact"
                 href="#contact"
-                className={`w-full sm:w-auto px-8 py-3.5 rounded-full font-display text-sm font-bold tracking-wide transition-all flex items-center justify-center gap-2 ${
-                  isLightMode
+                className={`w-full sm:w-auto px-8 py-3.5 rounded-full font-display text-sm font-bold tracking-wide transition-all flex items-center justify-center gap-2 ${isLightMode
                     ? "text-purple-600 hover:bg-stone-100/50"
                     : "text-slate-300 hover:text-white"
-                }`}
+                  }`}
               >
                 Contact Me
               </a>
@@ -797,11 +789,10 @@ export default function App() {
         ABOUT ME & IMAGES ATTACHMENT SECTION
         ========================================================================
       */}
-      <section 
-        id="about" 
-        className={`py-24 px-6 md:px-12 relative z-10 border-t ${
-          isLightMode ? "border-slate-200/50 bg-white/35" : "border-slate-900/40 bg-slate-950/10"
-        }`}
+      <section
+        id="about"
+        className={`py-24 px-6 md:px-12 relative z-10 border-t ${isLightMode ? "border-slate-200/50 bg-white/35" : "border-slate-900/40 bg-slate-950/10"
+          }`}
       >
         <div className="max-w-6xl mx-auto w-full">
           {/* Custom Section Header */}
@@ -809,9 +800,8 @@ export default function App() {
             <span className="text-purple-400 font-mono text-xs uppercase tracking-widest block mb-2">
               SYSTEM IDENTIFICATION
             </span>
-            <h2 className={`text-4xl font-display font-extrabold tracking-tight ${
-              isLightMode ? "text-slate-900" : "text-white"
-            }`}>
+            <h2 className={`text-4xl font-display font-extrabold tracking-tight ${isLightMode ? "text-slate-900" : "text-white"
+              }`}>
               Biography Core <span className="text-purple-500">&amp;</span> Aesthetics
             </h2>
             <div className="w-16 h-1 bg-purple-500 mx-auto mt-4 rounded-full" />
@@ -820,11 +810,10 @@ export default function App() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
             {/* Left Bio Card layout */}
             <div className="md:col-span-12 lg:col-span-12">
-              <div className={`p-8 md:p-10 rounded-3xl border transition-all ${
-                isLightMode
+              <div className={`p-8 md:p-10 rounded-3xl border transition-all ${isLightMode
                   ? "bg-white border-slate-200/60 shadow-sm"
                   : "glass glow-purple"
-              }`}>
+                }`}>
                 <div className="flex items-center gap-3 mb-6">
                   <div className="p-2 bg-purple-950/45 rounded-lg border border-purple-500/20 text-purple-400">
                     <User className="w-5 h-5" />
@@ -838,15 +827,13 @@ export default function App() {
                 </div>
 
                 {/* The required professional summary */}
-                <p className={`text-base md:text-lg leading-relaxed mb-6 font-sans ${
-                  isLightMode ? "text-slate-700 font-light" : "text-slate-200 font-light"
-                }`}>
+                <p className={`text-base md:text-lg leading-relaxed mb-6 font-sans ${isLightMode ? "text-slate-700 font-light" : "text-slate-200 font-light"
+                  }`}>
                   I am a passionate Full Stack MERN Developer and Artificial Intelligence &amp; Machine Learning student with experience in building scalable web applications, REST APIs, and interactive user interfaces. I enjoy solving real-world problems through technology and continuously improving my development skills.
                 </p>
 
-                <p className={`text-sm leading-relaxed ${
-                  isLightMode ? "text-slate-500" : "text-slate-400"
-                }`}>
+                <p className={`text-sm leading-relaxed ${isLightMode ? "text-slate-500" : "text-slate-400"
+                  }`}>
                   My educational discipline allows me to view software engineering through a predictive lens—writing application layers that aren’t just static state engines, but scalable pipelines structured to capture smart predictions and analytical feeds easily.
                 </p>
               </div>
@@ -866,9 +853,8 @@ export default function App() {
             <span className="text-purple-400 font-mono text-xs uppercase tracking-widest block mb-2">
               TECHNICAL COMPETENCIES
             </span>
-            <h2 className={`text-4xl font-display font-extrabold tracking-tight ${
-              isLightMode ? "text-slate-900" : "text-white"
-            }`}>
+            <h2 className={`text-4xl font-display font-extrabold tracking-tight ${isLightMode ? "text-slate-900" : "text-white"
+              }`}>
               Skills <span className="text-purple-500">&amp;</span> Infrastructure
             </h2>
             <div className="w-16 h-1 bg-purple-500 mx-auto mt-4 rounded-full" />
@@ -884,20 +870,18 @@ export default function App() {
 EXPERIENCE - INTERNSHIP TIMELINE
         ========================================================================
       */}
-      <section 
-        id="experience" 
-        className={`py-24 px-6 md:px-12 relative z-10 border-t border-b ${
-          isLightMode ? "border-slate-200/55 bg-white/30" : "border-slate-900/40 bg-slate-950/10"
-        }`}
+      <section
+        id="experience"
+        className={`py-24 px-6 md:px-12 relative z-10 border-t border-b ${isLightMode ? "border-slate-200/55 bg-white/30" : "border-slate-900/40 bg-slate-950/10"
+          }`}
       >
         <div className="max-w-4xl mx-auto w-full">
           <div className="text-center mb-16">
             <span className="text-purple-400 font-mono text-xs uppercase tracking-widest block mb-2">
               PROFESSIONAL HISTORY
             </span>
-            <h2 className={`text-4xl font-display font-extrabold tracking-tight ${
-              isLightMode ? "text-slate-900" : "text-white"
-            }`}>
+            <h2 className={`text-4xl font-display font-extrabold tracking-tight ${isLightMode ? "text-slate-900" : "text-white"
+              }`}>
               Experience Timeline
             </h2>
             <div className="w-16 h-1 bg-purple-500 mx-auto mt-4 rounded-full" />
@@ -917,11 +901,10 @@ EXPERIENCE - INTERNSHIP TIMELINE
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className={`p-6 md:p-8 rounded-3xl border transition-all ${
-                  isLightMode
+                className={`p-6 md:p-8 rounded-3xl border transition-all ${isLightMode
                     ? "bg-white border-slate-200/60 shadow-sm hover:shadow-md"
                     : "glass glow-blue hover:border-purple-500/20"
-                }`}
+                  }`}
               >
                 {/* Headers */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-purple-500/10">
@@ -929,9 +912,8 @@ EXPERIENCE - INTERNSHIP TIMELINE
                     <span className="text-purple-400 font-mono text-[10px] tracking-wide uppercase block">
                       ACTIVE INDUSTRIAL LEAGUE
                     </span>
-                    <h3 className={`text-2xl font-display font-extrabold ${
-                      isLightMode ? "text-slate-900" : "text-white"
-                    }`}>
+                    <h3 className={`text-2xl font-display font-extrabold ${isLightMode ? "text-slate-900" : "text-white"
+                      }`}>
                       {exp.company}
                     </h3>
                     <p className="text-purple-400 text-sm font-semibold mt-0.5 font-display flex items-center gap-1.5">
@@ -940,37 +922,34 @@ EXPERIENCE - INTERNSHIP TIMELINE
                     </p>
                   </div>
 
-                  <div className={`shrink-0 font-mono text-xs rounded-xl px-4 py-2 self-start md:self-center flex items-center gap-1.5 border ${
-                    isLightMode
+                  <div className={`shrink-0 font-mono text-xs rounded-xl px-4 py-2 self-start md:self-center flex items-center gap-1.5 border ${isLightMode
                       ? "bg-purple-50 border-purple-100 text-purple-700 font-semibold"
                       : "bg-slate-900 border-slate-800 text-purple-300"
-                  }`}>
+                    }`}>
                     <Calendar className="w-3.5 h-3.5 text-purple-400" />
                     {exp.duration}
                   </div>
                 </div>
 
                 {/* Bullet Points */}
-                <h4 className={`text-xs font-mono tracking-widest uppercase mb-4 ${
-                  isLightMode ? "text-slate-500" : "text-slate-400"
-                }`}>
+                <h4 className={`text-xs font-mono tracking-widest uppercase mb-4 ${isLightMode ? "text-slate-500" : "text-slate-400"
+                  }`}>
                   Core Responsibilities &amp; Code Impact
                 </h4>
-                
+
                 <ul className="space-y-3.5">
                   {exp.responsibilities.map((resp, idx) => (
-                    <motion.li 
+                    <motion.li
                       initial={{ opacity: 0, x: -10 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.08 }}
                       viewport={{ once: true }}
-                      key={idx} 
+                      key={idx}
                       className="flex items-start gap-3.5"
                     >
                       <CheckCircle2 className="w-5 h-5 text-purple-400 shrink-0 mt-0.5" />
-                      <span className={`text-sm leading-relaxed ${
-                        isLightMode ? "text-slate-600" : "text-slate-200"
-                      }`}>
+                      <span className={`text-sm leading-relaxed ${isLightMode ? "text-slate-600" : "text-slate-200"
+                        }`}>
                         {resp}
                       </span>
                     </motion.li>
@@ -993,9 +972,8 @@ EXPERIENCE - INTERNSHIP TIMELINE
             <span className="text-purple-400 font-mono text-xs uppercase tracking-widest block mb-2">
               PORTFOLIO SHOWCASE
             </span>
-            <h2 className={`text-4xl font-display font-extrabold tracking-tight ${
-              isLightMode ? "text-slate-900" : "text-white"
-            }`}>
+            <h2 className={`text-4xl font-display font-extrabold tracking-tight ${isLightMode ? "text-slate-900" : "text-white"
+              }`}>
               Selected Web Engineering Projects
             </h2>
             <div className="w-16 h-1 bg-purple-500 mx-auto mt-4 rounded-full" />
@@ -1010,20 +988,18 @@ EXPERIENCE - INTERNSHIP TIMELINE
         EDUCATION HISTORY
         ========================================================================
       */}
-      <section 
-        id="education" 
-        className={`py-24 px-6 md:px-12 relative z-10 border-t ${
-          isLightMode ? "border-slate-200/50 bg-white/20" : "border-slate-900/40 bg-slate-950/10"
-        }`}
+      <section
+        id="education"
+        className={`py-24 px-6 md:px-12 relative z-10 border-t ${isLightMode ? "border-slate-200/50 bg-white/20" : "border-slate-900/40 bg-slate-950/10"
+          }`}
       >
         <div className="max-w-4xl mx-auto w-full">
           <div className="text-center mb-16">
             <span className="text-purple-400 font-mono text-xs uppercase tracking-widest block mb-2">
               SCHOLASTIC FILE
             </span>
-            <h2 className={`text-4xl font-display font-extrabold tracking-tight ${
-              isLightMode ? "text-slate-900" : "text-white"
-            }`}>
+            <h2 className={`text-4xl font-display font-extrabold tracking-tight ${isLightMode ? "text-slate-900" : "text-white"
+              }`}>
               Education Chronicle
             </h2>
             <div className="w-16 h-1 bg-purple-500 mx-auto mt-4 rounded-full" />
@@ -1044,11 +1020,10 @@ EXPERIENCE - INTERNSHIP TIMELINE
                   <GraduationCap className="w-4 h-4 fill-slate-950" />
                 </div>
 
-                <div className={`p-6 md:p-8 rounded-2xl border transition ${
-                  isLightMode
+                <div className={`p-6 md:p-8 rounded-2xl border transition ${isLightMode
                     ? "bg-white border-slate-200/60 shadow-sm"
                     : "glass hover:border-purple-500/20"
-                }`}>
+                  }`}>
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4 pb-3 border-b border-purple-500/10">
                     <div>
                       <h4 className={`text-lg font-display font-bold ${isLightMode ? "text-slate-900" : "text-white"}`}>
@@ -1068,9 +1043,8 @@ EXPERIENCE - INTERNSHIP TIMELINE
                   </div>
 
                   {edu.description && (
-                    <p className={`text-xs md:text-sm leading-relaxed ${
-                      isLightMode ? "text-slate-600" : "text-slate-300"
-                    }`}>
+                    <p className={`text-xs md:text-sm leading-relaxed ${isLightMode ? "text-slate-600" : "text-slate-300"
+                      }`}>
                       {edu.description}
                     </p>
                   )}
@@ -1086,20 +1060,18 @@ EXPERIENCE - INTERNSHIP TIMELINE
         REVIEWS & TESTIMONIALS SECTION
         ========================================================================
       */}
-      <section 
-        id="reviews" 
-        className={`py-24 px-6 md:px-12 relative z-10 border-t ${
-          isLightMode ? "border-slate-200/50 bg-white/10" : "border-slate-900/40 bg-slate-950/20"
-        }`}
+      <section
+        id="reviews"
+        className={`py-24 px-6 md:px-12 relative z-10 border-t ${isLightMode ? "border-slate-200/50 bg-white/10" : "border-slate-900/40 bg-slate-950/20"
+          }`}
       >
         <div className="max-w-6xl mx-auto w-full">
           <div className="text-center mb-16">
             <span className="text-purple-400 font-mono text-xs uppercase tracking-widest block mb-2">
               VALUED EVALUATIONS
             </span>
-            <h2 className={`text-4xl font-display font-extrabold tracking-tight ${
-              isLightMode ? "text-slate-900" : "text-white"
-            }`}>
+            <h2 className={`text-4xl font-display font-extrabold tracking-tight ${isLightMode ? "text-slate-900" : "text-white"
+              }`}>
               Feedbacks &amp; Matrix Reviews
             </h2>
             <div className="w-16 h-1 bg-purple-500 mx-auto mt-4 rounded-full" />
@@ -1111,12 +1083,10 @@ EXPERIENCE - INTERNSHIP TIMELINE
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             {/* Left Column: Form to submit a new review */}
             <div className="lg:col-span-5">
-              <div className={`p-8 rounded-3xl border transition ${
-                isLightMode ? "bg-white border-slate-200 shadow-lg shadow-slate-100" : "glass glow-purple"
-              }`}>
-                <h3 className={`text-xl font-display font-bold mb-2 flex items-center gap-2 ${
-                  isLightMode ? "text-slate-900" : "text-white"
+              <div className={`p-8 rounded-3xl border transition ${isLightMode ? "bg-white border-slate-200 shadow-lg shadow-slate-100" : "glass glow-purple"
                 }`}>
+                <h3 className={`text-xl font-display font-bold mb-2 flex items-center gap-2 ${isLightMode ? "text-slate-900" : "text-white"
+                  }`}>
                   <Star className="w-5 h-5 text-amber-400 fill-amber-400" /> Lodge Review
                 </h3>
                 <p className="text-xs leading-relaxed text-slate-500 mb-6">
@@ -1125,9 +1095,8 @@ EXPERIENCE - INTERNSHIP TIMELINE
 
                 <form onSubmit={handleReviewSubmit} className="space-y-5">
                   <div>
-                    <label className={`block text-xs font-mono font-semibold uppercase tracking-wider mb-2 ${
-                      isLightMode ? "text-slate-600" : "text-slate-400"
-                    }`}>
+                    <label className={`block text-xs font-mono font-semibold uppercase tracking-wider mb-2 ${isLightMode ? "text-slate-600" : "text-slate-400"
+                      }`}>
                       Collaborator / Your Name
                     </label>
                     <input
@@ -1136,18 +1105,16 @@ EXPERIENCE - INTERNSHIP TIMELINE
                       value={reviewName}
                       onChange={(e) => setReviewName(e.target.value)}
                       required
-                      className={`w-full font-display text-sm px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition ${
-                        isLightMode
+                      className={`w-full font-display text-sm px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition ${isLightMode
                           ? "bg-slate-50 border-slate-200 focus:ring-purple-600 focus:border-transparent text-slate-900"
                           : "bg-slate-900/40 border-slate-800 focus:ring-purple-500 focus:border-transparent text-white"
-                      }`}
+                        }`}
                     />
                   </div>
 
                   <div>
-                    <label className={`block text-xs font-mono font-semibold uppercase tracking-wider mb-2 ${
-                      isLightMode ? "text-slate-600" : "text-slate-400"
-                    }`}>
+                    <label className={`block text-xs font-mono font-semibold uppercase tracking-wider mb-2 ${isLightMode ? "text-slate-600" : "text-slate-400"
+                      }`}>
                       Stars Rating Matrix
                     </label>
                     <div className="flex items-center gap-2 py-1">
@@ -1159,11 +1126,10 @@ EXPERIENCE - INTERNSHIP TIMELINE
                           className={`p-1 hover:scale-115 transition duration-150 cursor-pointer`}
                         >
                           <Star
-                            className={`w-8 h-8 transition-colors ${
-                              val <= reviewRating
+                            className={`w-8 h-8 transition-colors ${val <= reviewRating
                                 ? "text-amber-400 fill-amber-400"
                                 : "text-slate-600 hover:text-amber-300"
-                            }`}
+                              }`}
                           />
                         </button>
                       ))}
@@ -1174,9 +1140,8 @@ EXPERIENCE - INTERNSHIP TIMELINE
                   </div>
 
                   <div>
-                    <label className={`block text-xs font-mono font-semibold uppercase tracking-wider mb-2 ${
-                      isLightMode ? "text-slate-600" : "text-slate-400"
-                    }`}>
+                    <label className={`block text-xs font-mono font-semibold uppercase tracking-wider mb-2 ${isLightMode ? "text-slate-600" : "text-slate-400"
+                      }`}>
                       Evaluation Comments
                     </label>
                     <textarea
@@ -1185,22 +1150,20 @@ EXPERIENCE - INTERNSHIP TIMELINE
                       placeholder="Describe your collaboration feel, timeline quality, and code impact..."
                       value={reviewComment}
                       onChange={(e) => setReviewComment(e.target.value)}
-                      className={`w-full font-display text-sm px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition resize-none ${
-                        isLightMode
+                      className={`w-full font-display text-sm px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition resize-none ${isLightMode
                           ? "bg-slate-50 border-slate-200 focus:ring-purple-600 focus:border-transparent text-slate-900"
                           : "bg-slate-900/40 border-slate-800 focus:ring-purple-500 focus:border-transparent text-white"
-                      }`}
+                        }`}
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={reviewFormSubmitting}
-                    className={`w-full py-3.5 rounded-xl font-display font-bold text-sm tracking-wide transition flex items-center justify-center gap-2 cursor-pointer ${
-                      isLightMode
+                    className={`w-full py-3.5 rounded-xl font-display font-bold text-sm tracking-wide transition flex items-center justify-center gap-2 cursor-pointer ${isLightMode
                         ? "bg-purple-600 hover:bg-purple-700 text-white shadow-sm disabled:bg-purple-400"
                         : "bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white disabled:opacity-50"
-                    }`}
+                      }`}
                   >
                     {reviewFormSubmitting ? (
                       <span className="flex items-center gap-2">
@@ -1226,13 +1189,12 @@ EXPERIENCE - INTERNSHIP TIMELINE
                 const filteredReviews = reviews.length > 1
                   ? reviews.filter(rev => rev.id !== "default-1")
                   : reviews;
-                
+
                 return (
                   <>
                     <div className="flex items-center justify-between font-mono">
-                      <h3 className={`text-sm tracking-wider uppercase font-bold flex items-center gap-2 ${
-                        isLightMode ? "text-slate-800" : "text-purple-300"
-                      }`}>
+                      <h3 className={`text-sm tracking-wider uppercase font-bold flex items-center gap-2 ${isLightMode ? "text-slate-800" : "text-purple-300"
+                        }`}>
                         Testimonial Backpiles ({filteredReviews.length})
                       </h3>
                       <span className="text-xs text-slate-500 uppercase tracking-widest text-right">
@@ -1250,18 +1212,16 @@ EXPERIENCE - INTERNSHIP TIMELINE
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.3) }}
                             viewport={{ once: true }}
-                            className={`p-5 rounded-2xl border transition hover:translate-x-1 ${
-                              isLightMode
+                            className={`p-5 rounded-2xl border transition hover:translate-x-1 ${isLightMode
                                 ? "bg-white border-slate-200/90 shadow-sm"
                                 : "bg-slate-900/40 border-purple-500/10 hover:border-purple-500/25"
-                            }`}
+                              }`}
                           >
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-3 border-b border-purple-500/5 pb-2">
                               <div className="flex items-start justify-between w-full sm:w-auto">
                                 <div>
-                                  <h4 className={`text-sm font-display font-extrabold ${
-                                    isLightMode ? "text-slate-900" : "text-white"
-                                  }`}>
+                                  <h4 className={`text-sm font-display font-extrabold ${isLightMode ? "text-slate-900" : "text-white"
+                                    }`}>
                                     {rev.name}
                                   </h4>
                                   <span className="text-[10px] font-mono text-slate-500 block">
@@ -1287,11 +1247,10 @@ EXPERIENCE - INTERNSHIP TIMELINE
                                   {[1, 2, 3, 4, 5].map((star) => (
                                     <Star
                                       key={star}
-                                      className={`w-3.5 h-3.5 ${
-                                        star <= rev.rating
+                                      className={`w-3.5 h-3.5 ${star <= rev.rating
                                           ? "text-amber-400 fill-amber-400"
                                           : "text-slate-600"
-                                      }`}
+                                        }`}
                                     />
                                   ))}
                                 </div>
@@ -1309,9 +1268,8 @@ EXPERIENCE - INTERNSHIP TIMELINE
                               </div>
                             </div>
 
-                            <p className={`text-xs md:text-sm leading-relaxed font-sans ${
-                              isLightMode ? "text-slate-600" : "text-slate-300"
-                            }`}>
+                            <p className={`text-xs md:text-sm leading-relaxed font-sans ${isLightMode ? "text-slate-600" : "text-slate-300"
+                              }`}>
                               "{rev.comment}"
                             </p>
                           </motion.div>
@@ -1343,9 +1301,8 @@ EXPERIENCE - INTERNSHIP TIMELINE
             <span className="text-purple-400 font-mono text-xs uppercase tracking-widest block mb-2">
               TRANSMISSION LINK
             </span>
-            <h2 className={`text-4xl font-display font-extrabold tracking-tight ${
-              isLightMode ? "text-slate-900" : "text-white"
-            }`}>
+            <h2 className={`text-4xl font-display font-extrabold tracking-tight ${isLightMode ? "text-slate-900" : "text-white"
+              }`}>
               Let's Develop Together
             </h2>
             <div className="w-16 h-1 bg-purple-500 mx-auto mt-4 rounded-full" />
@@ -1354,12 +1311,10 @@ EXPERIENCE - INTERNSHIP TIMELINE
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             {/* Left Column: Direct info parameters */}
             <div className="lg:col-span-5 space-y-6">
-              <div className={`p-6 rounded-2xl border ${
-                isLightMode ? "bg-white border-slate-200" : "glass"
-              }`}>
-                <h3 className={`text-lg font-display font-bold mb-4 flex items-center gap-2 ${
-                  isLightMode ? "text-slate-900" : "text-white"
+              <div className={`p-6 rounded-2xl border ${isLightMode ? "bg-white border-slate-200" : "glass"
                 }`}>
+                <h3 className={`text-lg font-display font-bold mb-4 flex items-center gap-2 ${isLightMode ? "text-slate-900" : "text-white"
+                  }`}>
                   <Briefcase className="w-5 h-5 text-purple-400" /> Contact Specifications
                 </h3>
                 <p className="text-xs leading-relaxed text-slate-500 mb-6">
@@ -1373,9 +1328,8 @@ EXPERIENCE - INTERNSHIP TIMELINE
                     </div>
                     <div>
                       <span className="text-[9px] text-zinc-500 block uppercase font-mono">Secure Inbox</span>
-                      <a href="mailto:leelavinayakkothakota155@gmail.com" className={`text-sm hover:underline font-semibold ${
-                        isLightMode ? "text-slate-800" : "text-white"
-                      }`}>
+                      <a href="mailto:leelavinayakkothakota155@gmail.com" className={`text-sm hover:underline font-semibold ${isLightMode ? "text-slate-800" : "text-white"
+                        }`}>
                         leelavinayakkothkota155@gmail.com
                       </a>
                     </div>
@@ -1412,20 +1366,18 @@ EXPERIENCE - INTERNSHIP TIMELINE
 
             {/* Right Column: Modern contact form */}
             <div className="lg:col-span-7">
-              <form 
+              <form
                 id="contact-form"
                 onSubmit={handleContactSubmit}
-                className={`p-8 rounded-3xl border transition ${
-                  isLightMode
+                className={`p-8 rounded-3xl border transition ${isLightMode
                     ? "bg-white border-slate-200 shadow-lg shadow-slate-100"
                     : "glass glow-purple"
-                }`}
+                  }`}
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                   <div>
-                    <label className={`block text-xs font-mono font-bold uppercase tracking-wider mb-2 ${
-                      isLightMode ? "text-slate-700" : "text-slate-400"
-                    }`}>
+                    <label className={`block text-xs font-mono font-bold uppercase tracking-wider mb-2 ${isLightMode ? "text-slate-700" : "text-slate-400"
+                      }`}>
                       Full Name
                     </label>
                     <input
@@ -1435,18 +1387,16 @@ EXPERIENCE - INTERNSHIP TIMELINE
                       placeholder="e.g. Liam Smith"
                       value={formName}
                       onChange={(e) => setFormName(e.target.value)}
-                      className={`w-full font-display text-sm px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition ${
-                        isLightMode
+                      className={`w-full font-display text-sm px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition ${isLightMode
                           ? "bg-stone-50 border-stone-200 focus:ring-purple-600 focus:border-transparent text-slate-900"
                           : "bg-slate-900/60 border-slate-800 focus:ring-purple-500 focus:border-transparent text-white"
-                      }`}
+                        }`}
                     />
                   </div>
 
                   <div>
-                    <label className={`block text-xs font-mono font-bold uppercase tracking-wider mb-2 ${
-                      isLightMode ? "text-slate-700" : "text-slate-400"
-                    }`}>
+                    <label className={`block text-xs font-mono font-bold uppercase tracking-wider mb-2 ${isLightMode ? "text-slate-700" : "text-slate-400"
+                      }`}>
                       Email Node URL
                     </label>
                     <input
@@ -1456,19 +1406,17 @@ EXPERIENCE - INTERNSHIP TIMELINE
                       placeholder="e.g. liam@google.com"
                       value={formEmail}
                       onChange={(e) => setFormEmail(e.target.value)}
-                      className={`w-full font-display text-sm px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition ${
-                        isLightMode
+                      className={`w-full font-display text-sm px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition ${isLightMode
                           ? "bg-stone-50 border-stone-200 focus:ring-purple-600 focus:border-transparent text-slate-900"
                           : "bg-slate-900/60 border-slate-800 focus:ring-purple-500 focus:border-transparent text-white"
-                      }`}
+                        }`}
                     />
                   </div>
                 </div>
 
                 <div className="mb-8">
-                  <label className={`block text-xs font-mono font-bold uppercase tracking-wider mb-2 ${
-                    isLightMode ? "text-slate-700" : "text-slate-400"
-                  }`}>
+                  <label className={`block text-xs font-mono font-bold uppercase tracking-wider mb-2 ${isLightMode ? "text-slate-700" : "text-slate-400"
+                    }`}>
                     Draft Message
                   </label>
                   <textarea
@@ -1478,11 +1426,10 @@ EXPERIENCE - INTERNSHIP TIMELINE
                     placeholder="Describe your project, timeline requirements, and stack metrics..."
                     value={formMessage}
                     onChange={(e) => setFormMessage(e.target.value)}
-                    className={`w-full font-display text-sm px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition resize-none ${
-                      isLightMode
+                    className={`w-full font-display text-sm px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition resize-none ${isLightMode
                         ? "bg-stone-50 border-stone-200 focus:ring-purple-600 focus:border-transparent text-slate-900"
                         : "bg-slate-900/60 border-slate-800 focus:ring-purple-500 focus:border-transparent text-white"
-                    }`}
+                      }`}
                   />
                 </div>
 
@@ -1490,11 +1437,10 @@ EXPERIENCE - INTERNSHIP TIMELINE
                   id="btn-send-message"
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-full py-4 rounded-xl font-display font-bold tracking-wide transition flex items-center justify-center gap-2 cursor-pointer ${
-                    isLightMode
+                  className={`w-full py-4 rounded-xl font-display font-bold tracking-wide transition flex items-center justify-center gap-2 cursor-pointer ${isLightMode
                       ? "bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-200 disabled:bg-purple-400"
                       : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white disabled:opacity-50"
-                  }`}
+                    }`}
                 >
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
@@ -1521,9 +1467,8 @@ EXPERIENCE - INTERNSHIP TIMELINE
         FOOTER CHASE
         ========================================================================
       */}
-      <footer className={`py-12 px-6 md:px-12 border-t text-center relative z-10 ${
-        isLightMode ? "bg-white border-slate-200/60 text-slate-500" : "bg-slate-950 border-slate-900/40 text-slate-400"
-      }`}>
+      <footer className={`py-12 px-6 md:px-12 border-t text-center relative z-10 ${isLightMode ? "bg-white border-slate-200/60 text-slate-500" : "bg-slate-950 border-slate-900/40 text-slate-400"
+        }`}>
         <div className="max-w-7xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-6 font-mono text-xs">
           <div>
             &copy; 2026 Leela Vinayak. All rights secured.
@@ -1577,7 +1522,7 @@ EXPERIENCE - INTERNSHIP TIMELINE
               <div className="border border-slate-800 rounded-2xl p-6 md:p-8 bg-slate-900/35 relative overflow-hidden font-sans">
                 {/* Decorative watermarked grid */}
                 <div className="absolute inset-0 grid-bg-dark pointer-events-none opacity-20" />
-                
+
                 {/* Resume Header */}
                 <div className="text-center border-b border-slate-800 pb-6 relative z-10">
                   <h3 className="text-3xl font-display font-extrabold text-white">Leela Vinayak</h3>
@@ -1737,10 +1682,10 @@ EXPERIENCE - INTERNSHIP TIMELINE
       </AnimatePresence>
 
       {/* Global Floating Voice Chat Assistant with Wake Word Controls */}
-      <TalkingAvatar 
-        visitorName={visitorName} 
-        isLightMode={isLightMode} 
-        autoStartSpeech={autoStartSpeech} 
+      <TalkingAvatar
+        visitorName={visitorName}
+        isLightMode={isLightMode}
+        autoStartSpeech={autoStartSpeech}
         triggerSpeechText={speechTrigger}
         hasEntered={hasEntered}
       />
