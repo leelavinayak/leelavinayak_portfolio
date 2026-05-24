@@ -1417,10 +1417,10 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.92 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
-            className="w-[calc(100vw-32px)] max-w-[385px] h-[75vh] sm:h-[610px] rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-[0_15px_45px_rgba(147,51,234,0.12)] border border-purple-200/80 flex flex-col backdrop-blur-xl relative bg-white/98 text-slate-850"
+            className="w-full sm:w-[calc(100vw-32px)] sm:max-w-[385px] h-full sm:h-[610px] fixed sm:absolute inset-0 sm:inset-auto sm:bottom-0 sm:right-0 rounded-none sm:rounded-[32px] overflow-hidden shadow-[0_15px_45px_rgba(147,51,234,0.12)] border-0 sm:border border-purple-200/80 flex flex-col backdrop-blur-xl relative bg-white/98 text-slate-850 z-[100] sm:z-auto"
           >
             {/* Cyberpunk grid overlay background decoration for high structural finish */}
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none rounded-[32px] z-0" />
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none rounded-none sm:rounded-[32px] z-0" />
 
             {/* 1. Header with glowing futuristic status bar - Light Mode Theme only */}
             <div className="p-4 border-b border-purple-100 bg-white flex items-center justify-between text-slate-800 relative z-10 shrink-0">
