@@ -188,12 +188,8 @@ async function createViteMiddleware(app: express.Express) {
   }
 }
 
-async function startServer() {
-  const app = express();
-  const desiredPort = parsePort(process.env.PORT, 3000);
-  const PORT = await findAvailablePort(desiredPort);
-
-  app.use(express.json());
+const app = express();
+app.use(express.json());
 
   // Initialize Gemini AI Client lazily or check for API key
   let aiClient: GoogleGenAI | null = null;
@@ -430,20 +426,28 @@ Keep your replies relative to the user's intent. If they ask a general topic not
     }
   });
 
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== "production") {
-    await createViteMiddleware(app);
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
+  // For Vercel Serverless environment, we do not serve static files or listen
+  // because Vercel serves the static files in 'dist' natively at the edge.
+  if (!process.env.VERCEL) {
+    const startLocalServer = async () => {
+      const desiredPort = parsePort(process.env.PORT, 3000);
+      const PORT = await findAvailablePort(desiredPort);
+      
+      if (process.env.NODE_ENV !== "production") {
+        await createViteMiddleware(app);
+      } else {
+        const distPath = path.join(process.cwd(), 'dist');
+        app.use(express.static(distPath));
+        app.get('*', (req, res) => {
+          res.sendFile(path.join(distPath, 'index.html'));
+        });
+      }
+
+      app.listen(PORT, "0.0.0.0", () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+      });
+    };
+    startLocalServer();
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
-
-startServer();
+export default app;
