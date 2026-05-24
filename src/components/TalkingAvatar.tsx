@@ -93,11 +93,29 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     isMutedRef.current = isMuted;
   }, [isMuted]);
 
-  // Clean reset of browser SpeechSynthesis queue on page load/first-mount
+  // Clean reset of browser SpeechSynthesis queue and voice pre-loading on page load/first-mount
   useEffect(() => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       try {
         window.speechSynthesis.cancel();
+        
+        // Trigger voice loading immediately on mount to ensure they are ready before click
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
+          voicesLoadedRef.current = true;
+        }
+        
+        const handleVoicesChanged = () => {
+          const v = window.speechSynthesis.getVoices();
+          if (v.length > 0) {
+            voicesLoadedRef.current = true;
+          }
+        };
+        window.speechSynthesis.addEventListener("voiceschanged", handleVoicesChanged);
+        
+        return () => {
+          window.speechSynthesis.removeEventListener("voiceschanged", handleVoicesChanged);
+        };
       } catch (e) {}
     }
   }, []);
@@ -1047,6 +1065,12 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
   };
 
   const getBestMaleVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null => {
+    // Apple device check to bypass forcing custom voices on iOS/macOS Safari where Siri voices fail
+    const isAppleDevice = typeof navigator !== "undefined" && /iPad|iPhone|iPod|Macintosh/i.test(navigator.userAgent);
+    if (isAppleDevice) {
+      return null;
+    }
+
     // 1. Filter out known broken/blacklisted voices
     const activeVoices = voices.filter(v => !brokenVoicesRef.current.has(v.name));
     
