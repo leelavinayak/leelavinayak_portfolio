@@ -1377,30 +1377,18 @@ export default function TalkingAvatar({ visitorName, isLightMode, autoStartSpeec
     } catch (e) {}
 
     // Force unblock Chrome & Safari SpeechSynthesis sandbox rules via direct user interaction token.
-    // CRITICAL: The dummy utterance must complete (via onend) BEFORE we queue real speech,
-    // otherwise Chrome drops the audio context silently.
+    // Play the silent dummy utterance to trigger browser speech engine unlock, then execute triggerSpeechAfterUnlock immediately.
     if ("speechSynthesis" in window) {
       try {
         window.speechSynthesis.cancel();
-        // Use a single space instead of empty string — some browsers skip empty utterances entirely
         const dummyUtter = new SpeechSynthesisUtterance(" ");
         dummyUtter.volume = 0; // Silent unlock
-        dummyUtter.onend = () => {
-          // NOW the audio context is unlocked — safe to speak real content
-          triggerSpeechAfterUnlock();
-        };
-        dummyUtter.onerror = () => {
-          // Even on error, try to speak anyway
-          triggerSpeechAfterUnlock();
-        };
         window.speechSynthesis.speak(dummyUtter);
       } catch (e) {
-        // Fallback: just speak directly
-        triggerSpeechAfterUnlock();
+        console.warn("Silent unlock bypass error:", e);
       }
-    } else {
-      triggerSpeechAfterUnlock();
     }
+    triggerSpeechAfterUnlock();
   };
 
   useEffect(() => {
